@@ -18,8 +18,8 @@
       --text: #172033;
       --muted: #667085;
       --line: rgba(15, 23, 42, 0.1);
-      /* 统一换成你指定的 8DD5FF 色号，全面废除渐变 */
-      --primary: #8DD5FF; 
+      /* 统一换成指定的 1FA9F9 色号 */
+      --primary: #1FA9F9; 
       --success: #16a34a;
       --shadow: 0 24px 70px rgba(15, 23, 42, 0.10);
       --radius-lg: 28px;
@@ -33,10 +33,10 @@
       min-height: 100vh;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
       color: var(--text);
-      /* 全局蓝调背景均同步更新为新色号 */
+      /* RGB(31, 169, 249) 是 #1FA9F9 的十进制数值 */
       background:
-        radial-gradient(circle at 12% 12%, rgba(141, 213, 255, 0.16), transparent 30%),
-        radial-gradient(circle at 86% 0%, rgba(141, 213, 255, 0.18), transparent 32%),
+        radial-gradient(circle at 12% 12%, rgba(31, 169, 249, 0.16), transparent 30%),
+        radial-gradient(circle at 86% 0%, rgba(31, 169, 249, 0.18), transparent 32%),
         linear-gradient(180deg, #ffffff 0%, var(--bg) 42%, #eef4ff 100%);
       line-height: 1.6;
       transition: background 0.3s ease;
@@ -44,7 +44,6 @@
 
     button, input, textarea { font: inherit; }
 
-    /* 核心主动作按钮采用无渐变扁平极简风 */
     button {
       border: 0;
       border-radius: 999px;
@@ -54,22 +53,20 @@
       cursor: pointer;
       font-weight: 700;
       letter-spacing: -0.01em;
-      box-shadow: 0 12px 22px rgba(141, 213, 255, 0.18);
+      box-shadow: 0 12px 22px rgba(31, 169, 249, 0.18);
       transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
     }
 
     button:disabled { cursor: not-allowed; opacity: 0.48; box-shadow: none; }
 
-    /* 电脑端 hover 反馈 */
     @media (hover: hover) {
-      button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(141, 213, 255, 0.24); }
-      .option:hover { transform: translateY(-1px); border-color: rgba(141,213,255,0.32); background: #ffffff; }
+      button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(31, 169, 249, 0.24); }
+      .option:hover { transform: translateY(-1px); border-color: rgba(31,169,249,0.32); background: #ffffff; }
       .prompt-copy:hover { color: var(--primary); }
     }
 
-    button:active:not(:disabled) { transform: translateY(0); box-shadow: 0 4px 10px rgba(141, 213, 255, 0.1); }
+    button:active:not(:disabled) { transform: translateY(0); box-shadow: 0 4px 10px rgba(31, 169, 249, 0.1); }
 
-    /* 极简幽灵按钮 */
     .ghost { color: #1f2937; background: rgba(255,255,255,0.9); border: 1px solid var(--line); box-shadow: none; }
     .ghost-sm { padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 12px; }
 
@@ -99,7 +96,7 @@
       font-family: ui-monospace, SFMono-Regular, monospace; font-size: 14px;
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
     }
-    #raw-input:focus, #chat-input:focus { border-color: rgba(141, 213, 255, 0.45); box-shadow: 0 0 0 5px rgba(141, 213, 255, 0.10); }
+    #raw-input:focus, #chat-input:focus { border-color: rgba(31, 169, 249, 0.45); box-shadow: 0 0 0 5px rgba(31, 169, 249, 0.10); }
     #raw-input::placeholder, #chat-input::placeholder { opacity: 0.25; color: var(--text); }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
@@ -122,7 +119,7 @@
       background: rgba(255,255,255,0.78); cursor: pointer; font-size: 16px;
       transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
     }
-    .option:has(input:checked) { border-color: rgba(141,213,255,0.62); background: #eff6ff; }
+    .option:has(input:checked) { border-color: rgba(31,169,249,0.62); background: #eff6ff; }
     .option input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--primary); }
     .option strong { margin-right: 4px; color: var(--primary); }
 
@@ -155,12 +152,11 @@
     .jump-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 10px; }
     .jump-grid button { border-radius: 14px; background: #e5e7eb; color: #111827; box-shadow: none; }
     .jump-grid button.done { background: #dbeafe; color: var(--primary); }
-    .jump-grid button.current { outline: 3px solid rgba(141,213,255,0.25); background: var(--primary); color: #ffffff; }
+    .jump-grid button.current { outline: 3px solid rgba(31,169,249,0.25); background: var(--primary); color: #ffffff; }
     
     .shortcut-list { padding-left: 20px; line-height: 2.2; color: #344054; font-size: 15px; }
     .shortcut-list code { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: ui-monospace, monospace; color: var(--primary); margin-right: 8px; }
 
-    /* AI 球（干净定位） */
     #ai-wrapper {
       position: fixed; right: 24px; top: 24px; z-index: 901;
       display: flex; flex-direction: column; align-items: flex-end;
@@ -168,10 +164,9 @@
     #open-chat {
       width: 52px; height: 52px; padding: 0; display: grid; place-items: center;
       font-size: 26px; font-family: ui-rounded, system-ui, sans-serif; font-weight: 800;
-      box-shadow: 0 8px 20px rgba(141,213,255,0.25);
+      box-shadow: 0 8px 20px rgba(31,169,249,0.25);
     }
     
-    /* 对话框的主体与内部设计 */
     #chat-panel { position: fixed; right: 24px; top: 86px; width: min(390px, calc(100vw - 48px)); height: min(560px, calc(100vh - 110px)); display: none; flex-direction: column; z-index: 900; overflow: hidden; }
     #chat-log { flex: 1; overflow: auto; padding: 16px; font-size: 14px; position: relative; }
     #chat-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.25; font-weight: 600; font-size: 15px; pointer-events: none; }
@@ -181,7 +176,6 @@
     #chat-input::-webkit-scrollbar { display: none; }
     #chat-send { flex-shrink: 0; margin-bottom: 2px; }
 
-    /* 专门给手机端对话框加的内部关闭键（电脑上隐形） */
     #mobile-chat-close { display: none; }
 
     .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(24px); opacity: 0; pointer-events: none; z-index: 2000; padding: 12px 16px; border-radius: 999px; background: rgba(17,24,39,0.92); color: #fff; font-weight: 750; transition: opacity .2s ease, transform .2s ease; }
@@ -189,7 +183,8 @@
 
     /* ========== 手机端自动化适配响应样式 ========== */
     @media (max-width: 860px) {
-      .app-shell { width: min(100% - 16px, 920px); padding-top: 12px; }
+      /* 给手机端增加了巨大的 padding-bottom 留白，防止滑到底部卡住或被工具栏遮挡 */
+      .app-shell { width: min(100% - 16px, 920px); padding-top: 12px; padding-bottom: 140px; }
       .composer, #quiz-container { border-radius: 20px; padding: 16px; }
       .quiz-top { flex-direction: column; gap: 12px; }
       #top-btns { width: 100%; justify-content: flex-end; overflow-x: auto; padding-bottom: 4px; }
@@ -198,10 +193,8 @@
       #prev-btn { flex: 1; margin: 0; text-align: center; }
       #action-btn { flex: 1; margin: 0; text-align: center; width: 100%; }
 
-      /* AI 球移动端下沉 */
       #ai-wrapper { top: auto; bottom: 24px; right: 24px; }
 
-      /* 移动端弹出面板形态转换：底部全屏式抽屉 */
       #chat-panel {
         top: auto; bottom: 0; right: 0; left: 0;
         width: 100%; height: 75vh;
@@ -210,7 +203,6 @@
         box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
       }
 
-      /* 移动端专属：在面板头部里面长出一个极简灰 ✕ 关闭按钮 */
       #mobile-chat-close {
         display: grid; place-items: center;
         position: absolute; top: 14px; right: 18px; z-index: 10;
@@ -356,7 +348,7 @@
       const chatInput = $('chat-input');
       const chatSend = $('chat-send');
       const openChat = $('open-chat');
-      const mobileChatClose = $('mobile-chat-close'); // 绑定手机专用关闭键
+      const mobileChatClose = $('mobile-chat-close');
       const aiWrapper = $('ai-wrapper');
       const toast = $('toast');
 
@@ -544,7 +536,6 @@
       function showFeedback() {
         const correct = quiz[current].answer; const selected = userChoices[current] || [];
         const ok = isSameSet(selected, correct);
-        /* 按照要求，将原句精简改为： “正确” 两个字 */
         feedback.textContent = ok ? '正确' : `错误，正确答案：${correct.sort().join('、')}`;
         feedback.className = `feedback ${ok ? 'correct' : 'incorrect'}`;
         explainBtn.style.display = 'inline-grid';
@@ -573,7 +564,8 @@
         explainBtn.style.display = 'none'; explainBox.textContent = '';
         feedback.textContent = `正确率 ${Math.round((score / quiz.length) * 100)}%`; feedback.className = 'feedback correct';
         
-        if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#8DD5FF', '#16a34a', '#f59e0b', '#7c3aed'] });
+        // 撒花特效也更新为你专属的 #1FA9F9
+        if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#1FA9F9', '#16a34a', '#f59e0b', '#7c3aed'] });
         if (document.fullscreenElement) document.exitFullscreen();
         if (document.body.classList.contains('immersive')) { document.body.classList.remove('immersive'); }
       }
@@ -698,30 +690,30 @@
 
       // AI 控制开关
       openChat.addEventListener('click', (e) => {
-        e.stopPropagation(); // 阻止事件冒泡，防止触发“点击外部关闭”逻辑
+        e.stopPropagation();
         chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
-        if (chatPanel.style.display === 'flex') chatInput.focus();
+        
+        // 【关键修复点】：只有在非手机端的情况下，打开面板才自动聚焦弹键盘
+        const isMobile = window.innerWidth <= 860;
+        if (chatPanel.style.display === 'flex' && !isMobile) {
+          chatInput.focus();
+        }
       });
 
-      // 手机端专用关闭键点击逻辑
       mobileChatClose.addEventListener('click', (e) => {
         e.stopPropagation();
         chatPanel.style.display = 'none';
       });
 
-      // 电脑Web端：点击聊天框以外的任意区域收起聊天框
       document.addEventListener('click', (event) => {
         const isMobile = window.innerWidth <= 860;
-        // 如果是电脑端，且聊天框处于打开状态
         if (!isMobile && chatPanel.style.display === 'flex') {
-          // 判断点击的区域既不是聊天框本身，也不是呼叫 AI 的球形按钮
           if (!chatPanel.contains(event.target) && !openChat.contains(event.target)) {
             chatPanel.style.display = 'none';
           }
         }
       });
 
-      // 手机悬浮球自由移动触控逻辑（不带任何关闭按钮）
       let isDragging = false, startX, startY, initialTop, initialLeft;
       aiWrapper.addEventListener('touchstart', e => {
         isDragging = true;
