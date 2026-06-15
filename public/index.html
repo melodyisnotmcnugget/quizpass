@@ -18,7 +18,6 @@
       --text: #172033;
       --muted: #667085;
       --line: rgba(15, 23, 42, 0.1);
-      /* 更新为你指定的新主色号 47AFEB */
       --primary: #47AFEB; 
       --success: #16a34a;
       --shadow: 0 24px 70px rgba(15, 23, 42, 0.10);
@@ -33,7 +32,6 @@
       min-height: 100vh;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
       color: var(--text);
-      /* 背景光晕对应使用 47AFEB 的 RGB 值：71, 175, 235 */
       background:
         radial-gradient(circle at 12% 12%, rgba(71, 175, 235, 0.16), transparent 30%),
         radial-gradient(circle at 86% 0%, rgba(71, 175, 235, 0.18), transparent 32%),
@@ -112,7 +110,6 @@
     .icon-btn.text-icon { width: auto; padding: 0 16px; font-size: 15px; font-weight: 750; }
     .icon-btn.faved { color: #d97706; background: #fff7ed; border-color: rgba(245, 158, 11, 0.35); }
 
-    /* 手机专用的 AI 问号按钮，默认电脑端隐藏 */
     #mobile-open-chat { display: none; font-family: ui-rounded, system-ui, sans-serif; font-weight: 800; font-size: 20px; }
 
     #options-area { display: grid; gap: 12px; margin: 20px 0; }
@@ -124,7 +121,6 @@
     }
     .option:has(input:checked) { border-color: rgba(71, 175, 235, 0.62); background: #eff6ff; }
     
-    /* 彻底重写原生圆圈按钮，解决变黑问题，双端保持高级蓝白质感 */
     .option input {
       appearance: none; -webkit-appearance: none;
       width: 20px; height: 20px; margin-top: 2px;
@@ -180,7 +176,6 @@
     .shortcut-list { padding-left: 20px; line-height: 2.2; color: #344054; font-size: 15px; }
     .shortcut-list code { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: ui-monospace, monospace; color: var(--primary); margin-right: 8px; }
 
-    /* 电脑端悬浮 AI 球 */
     #ai-wrapper {
       position: fixed; right: 24px; top: 24px; z-index: 901;
       display: flex; flex-direction: column; align-items: flex-end;
@@ -206,17 +201,18 @@
 
     /* ========== 手机端自动化适配 ========== */
     @media (max-width: 860px) {
-      /* 注入底部 50vh 超大空白，彻底解决卡手问题 */
       .app-shell { width: min(100% - 16px, 920px); padding-top: 12px; padding-bottom: 50vh; }
       .composer, #quiz-container { border-radius: 20px; padding: 16px; }
       .quiz-top { flex-direction: column; gap: 12px; }
       #top-btns { width: 100%; justify-content: flex-end; overflow-x: auto; padding-bottom: 4px; }
       
+      /* 让解析按钮霸占最左侧，剩下的全往右边靠！ */
+      #explainBtn { margin-right: auto; }
+
       .quiz-actions { display: flex; width: 100%; gap: 12px; justify-content: space-between; }
       #prev-btn { flex: 1; margin: 0; text-align: center; }
       #action-btn { flex: 1; margin: 0; text-align: center; width: 100%; }
 
-      /* 手机端干掉独立悬浮球，让他在顶部按钮里显示 */
       #ai-wrapper { display: none !important; }
       #mobile-open-chat { display: inline-grid; }
 
@@ -270,11 +266,11 @@
           <p id="question-text"></p>
         </div>
         <div id="top-btns">
+          <button id="explainBtn" class="icon-btn text-icon" style="display:none">此题解析</button>
           <button id="fullscreen-btn" class="icon-btn" title="进入沉浸式刷题" aria-label="沉浸模式">⛶</button>
           <button id="jump-btn" class="icon-btn" title="题号导航" aria-label="题号导航">⌘</button>
           <button id="fav-btn" class="icon-btn" title="收藏/取消收藏 (Cmd+S)" aria-label="收藏/取消收藏">★</button>
           <button id="mobile-open-chat" class="icon-btn" title="问 AI 老师" aria-label="问 AI 老师">?</button>
-          <button id="explainBtn" class="icon-btn text-icon" style="display:none">此题解析</button>
         </div>
       </div>
       <div id="options-area"></div>
@@ -714,11 +710,9 @@
         streamExplain(prompt, current, explainBox);
       });
 
-      // 统一切换 AI 聊天窗的逻辑
       const handleChatToggle = (e) => {
         e.stopPropagation();
         chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
-        // 只有电脑端打开面板时才自动抢占焦点（弹出键盘），手机端需要用户手动点输入框
         if (chatPanel.style.display === 'flex' && window.innerWidth > 860) {
           chatInput.focus();
         }
@@ -740,6 +734,26 @@
           }
         }
       });
+
+      let isDragging = false, startX, startY, initialTop, initialLeft;
+      aiWrapper.addEventListener('touchstart', e => {
+        isDragging = true;
+        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+        const rect = aiWrapper.getBoundingClientRect();
+        initialLeft = rect.left; initialTop = rect.top;
+        aiWrapper.style.transition = 'none';
+      }, {passive: false});
+
+      aiWrapper.addEventListener('touchmove', e => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const dx = e.touches[0].clientX - startX, dy = e.touches[0].clientY - startY;
+        aiWrapper.style.left = `${initialLeft + dx}px`;
+        aiWrapper.style.top = `${initialTop + dy}px`;
+        aiWrapper.style.right = 'auto'; aiWrapper.style.bottom = 'auto';
+      }, {passive: false});
+
+      aiWrapper.addEventListener('touchend', () => { isDragging = false; });
 
       chatInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; });
       let isComposing = false;
