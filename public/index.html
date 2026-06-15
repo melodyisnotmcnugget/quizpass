@@ -8,6 +8,7 @@
   <link rel="icon" type="image/x-icon" sizes="64x64" href="thumb.ico?v=1">
   <link rel="shortcut icon" href="thumb.ico?v=1">
   <link rel="apple-touch-icon" href="thumb.ico?v=1">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       color-scheme: light;
@@ -42,6 +43,7 @@
         radial-gradient(circle at 86% 0%, rgba(14, 165, 233, 0.18), transparent 32%),
         linear-gradient(180deg, #ffffff 0%, var(--bg) 42%, #eef4ff 100%);
       line-height: 1.6;
+      transition: background 0.3s ease;
     }
 
     button, input, textarea { font: inherit; }
@@ -63,11 +65,9 @@
     button:active:not(:disabled) { transform: translateY(0); }
     button:disabled { cursor: not-allowed; opacity: 0.48; box-shadow: none; }
 
-    .app-shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 80px; }
+    .app-shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 80px; transition: all 0.3s ease; }
 
-    .hero {
-      margin-top: 12px;
-    }
+    .hero { margin-top: 12px; transition: opacity 0.3s ease, height 0.3s ease; }
 
     .card {
       background: var(--surface);
@@ -76,10 +76,12 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(22px) saturate(150%);
       -webkit-backdrop-filter: blur(22px) saturate(150%);
+      transition: all 0.3s ease;
     }
 
     .composer { padding: 20px; }
-    .composer-header { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+    .composer-header { margin-bottom: 14px; }
+    .title-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .composer h2, .quiz-title h2, .modal h2 { margin: 0; letter-spacing: -0.035em; line-height: 1.1; }
     .muted { color: var(--muted); margin: 5px 0 0; font-size: 14px; }
     .prompt-hint { margin: 8px 0 0; color: #98a2b3; font-size: 12px; line-height: 1.5; }
@@ -89,7 +91,7 @@
     textarea {
       display: block;
       width: 100%;
-      min-height: 140px;
+      min-height: 150px;
       resize: vertical;
       padding: 18px;
       border: 1px solid var(--line);
@@ -104,9 +106,16 @@
 
     textarea:focus, #chat-input:focus { border-color: rgba(37, 99, 235, 0.45); box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.10); }
 
+    /* 让占位符文字变得柔和（25%透明度） */
+    textarea::placeholder {
+      opacity: 0.25;
+      color: var(--text);
+    }
+
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
     .secondary { background: #111827; box-shadow: 0 12px 22px rgba(17, 24, 39, 0.14); }
     .ghost { color: #1f2937; background: rgba(255,255,255,0.9); border: 1px solid var(--line); box-shadow: none; }
+    .ghost-sm { padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 12px; }
     .success-btn { background: linear-gradient(135deg, #16a34a, #22c55e); }
     .purple-btn { background: linear-gradient(135deg, #7c3aed, #a855f7); }
     .danger-btn { background: linear-gradient(135deg, #dc2626, #f97316); }
@@ -115,12 +124,12 @@
     .quiz-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
     .quiz-title { min-width: 0; }
     #q-num { color: #1d4ed8; font-weight: 850; font-size: 14px; margin-bottom: 6px; }
-    #question-text { margin: 0; font-size: clamp(21px, 3vw, 32px); font-weight: 850; line-height: 1.25; letter-spacing: -0.04em; }
-    #top-btns { display: flex; gap: 8px; flex-shrink: 0; }
+    #question-text { margin: 0; font-size: clamp(21px, 3vw, 32px); font-weight: 850; line-height: 1.25; letter-spacing: -0.04em; transition: font-size 0.3s ease; }
+    #top-btns { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
     .icon-btn { width: 44px; height: 44px; padding: 0; display: inline-grid; place-items: center; color: #1f2937; background: rgba(255,255,255,0.92); border: 1px solid var(--line); box-shadow: none; font-size: 18px; }
     .icon-btn.faved { color: #d97706; background: #fff7ed; border-color: rgba(245, 158, 11, 0.35); }
 
-    #options-area { display: grid; gap: 12px; margin: 20px 0; }
+    #options-area { display: grid; gap: 12px; margin: 20px 0; transition: gap 0.3s ease; }
     .option {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -131,7 +140,8 @@
       border-radius: 18px;
       background: rgba(255,255,255,0.78);
       cursor: pointer;
-      transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
+      font-size: 16px;
+      transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease, padding 0.3s ease, font-size 0.3s ease;
     }
     .option:hover { transform: translateY(-1px); border-color: rgba(37,99,235,0.32); background: #ffffff; }
     .option:has(input:checked) { border-color: rgba(37,99,235,0.62); background: #eff6ff; }
@@ -145,6 +155,15 @@
     .incorrect { color: #991b1b; background: #fee2e2; }
     #explainBox { display: none; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; margin-top: 14px; background: #f8fafc; padding: 16px; border-radius: 18px; border: 1px solid var(--line); color: #344054; }
     #explainBox:not(:empty) { display: block; }
+
+    body.immersive .hero { display: none !important; }
+    body.immersive { background: #f8fafc; }
+    body.immersive .app-shell { width: 100%; max-width: 100%; padding: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    body.immersive #quiz-container { width: 100%; max-width: 1000px; margin: 0; min-height: 100vh; border-radius: 0; border: none; padding: 6vh 5vw; display: flex; flex-direction: column; justify-content: center; background: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    body.immersive #question-text { font-size: clamp(26px, 4vw, 40px); margin-bottom: 10px; }
+    body.immersive #options-area { gap: 18px; margin: 30px 0; }
+    body.immersive .option { padding: 22px 24px; font-size: 18px; border-radius: 22px; }
+    body.immersive .option input { width: 22px; height: 22px; }
 
     .modal-backdrop { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(15, 23, 42, 0.38); backdrop-filter: blur(8px); padding: 22px; overflow: auto; }
     .modal-backdrop.open { display: grid; place-items: start center; }
@@ -161,13 +180,19 @@
     .jump-grid button { border-radius: 14px; background: #e5e7eb; color: #111827; box-shadow: none; }
     .jump-grid button.done { background: #dbeafe; color: #1d4ed8; }
     .jump-grid button.current { outline: 3px solid rgba(37,99,235,0.25); background: var(--primary); color: #ffffff; }
+    
+    .shortcut-list { padding-left: 20px; line-height: 2.2; color: #344054; font-size: 15px; }
+    .shortcut-list code { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: ui-monospace, monospace; color: var(--primary); margin-right: 8px; }
 
-    #chat-panel { position: fixed; right: 20px; bottom: 82px; width: min(390px, calc(100vw - 32px)); height: min(560px, calc(100vh - 130px)); display: none; flex-direction: column; z-index: 900; overflow: hidden; }
+    /* 修改 AI 对话面板位置到右上角 */
+    #chat-panel { position: fixed; right: 24px; top: 86px; width: min(390px, calc(100vw - 48px)); height: min(560px, calc(100vh - 110px)); display: none; flex-direction: column; z-index: 900; overflow: hidden; }
     #chat-log { flex: 1; overflow: auto; padding: 16px; font-size: 14px; }
     .chat-row { padding: 12px; border-radius: 16px; background: #f8fafc; margin-bottom: 10px; border: 1px solid var(--line); }
     .chat-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: rgba(255,255,255,0.76); }
     #chat-input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 11px 14px; outline: none; }
-    #open-chat { position: fixed; right: 20px; bottom: 22px; width: 52px; height: 52px; padding: 0; display: grid; place-items: center; z-index: 901; font-size: 20px; }
+    
+    /* 修改 AI 按钮位置到右上角 */
+    #open-chat { position: fixed; right: 24px; top: 24px; width: 52px; height: 52px; padding: 0; display: grid; place-items: center; z-index: 901; font-size: 26px; font-family: ui-rounded, system-ui, sans-serif; font-weight: 800; }
 
     .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(24px); opacity: 0; pointer-events: none; z-index: 2000; padding: 12px 16px; border-radius: 999px; background: rgba(17,24,39,0.92); color: #fff; font-weight: 750; transition: opacity .2s ease, transform .2s ease; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -185,11 +210,11 @@
     <section class="hero">
       <section class="composer card" aria-labelledby="input-title">
         <div class="composer-header">
-          <div>
+          <div class="title-row">
             <h2 id="input-title">导入题库</h2>
-            <p class="muted">每题包含题干、A-H 选项和以 * 开头的答案。</p>
-            <p class="prompt-hint">导入题库前请用 AI 工具整理格式，<button id="copy-prompt-btn" class="prompt-copy" type="button">点击复制 prompt</button></p>
+            <button id="show-shortcuts-btn" class="ghost ghost-sm">⌘ 快捷键</button>
           </div>
+          <p class="prompt-hint">如果导入题库失败，请先用 AI 工具整理题目格式，<button id="copy-prompt-btn" class="prompt-copy" type="button">点击复制 prompt</button></p>
         </div>
         <textarea id="raw-input" placeholder="示例：&#10;1. HTML 的全称是什么？&#10;A. Hyper Text Markup Language&#10;B. High Text Machine Language&#10;*A"></textarea>
         <div class="actions">
@@ -209,8 +234,9 @@
           <p id="question-text"></p>
         </div>
         <div id="top-btns">
+          <button id="fullscreen-btn" class="icon-btn" title="进入沉浸式刷题" aria-label="沉浸模式">⛶</button>
           <button id="jump-btn" class="icon-btn" title="题号导航" aria-label="题号导航">⌘</button>
-          <button id="fav-btn" class="icon-btn" title="收藏/取消收藏" aria-label="收藏/取消收藏">★</button>
+          <button id="fav-btn" class="icon-btn" title="收藏/取消收藏 (Cmd+S)" aria-label="收藏/取消收藏">★</button>
         </div>
       </div>
       <div id="options-area"></div>
@@ -224,9 +250,39 @@
     </section>
   </main>
 
-  <div id="fav-manager" class="modal-backdrop"><div class="modal card"><div class="modal-head"><h2>收藏夹</h2><button class="ghost" data-close="fav-manager">关闭</button></div><div id="fav-list"></div></div></div>
+  <div id="fav-manager" class="modal-backdrop">
+    <div class="modal card">
+      <div class="modal-head">
+        <h2>收藏夹</h2>
+        <div class="mini-actions">
+          <button id="clear-fav-btn" class="danger-btn">清空全部</button>
+          <button class="ghost" data-close="fav-manager">关闭</button>
+        </div>
+      </div>
+      <div id="fav-list"></div>
+    </div>
+  </div>
+  
   <div id="jump-modal" class="modal-backdrop"><div class="modal card"><div class="modal-head"><h2>跳转到题号</h2><button class="ghost" data-close="jump-modal">关闭</button></div><div id="jump-grid" class="jump-grid"></div></div></div>
   <div id="bank-modal" class="modal-backdrop"><div class="modal card"><div class="modal-head"><h2>已保存题库</h2><button class="ghost" data-close="bank-modal">关闭</button></div><div id="bank-list"></div></div></div>
+  
+  <div id="shortcuts-modal" class="modal-backdrop">
+    <div class="modal card">
+      <div class="modal-head">
+        <h2>快捷键说明</h2>
+        <button class="ghost" data-close="shortcuts-modal">关闭</button>
+      </div>
+      <ul class="shortcut-list">
+        <li><code>Cmd/Ctrl + [</code> 上一题</li>
+        <li><code>Cmd/Ctrl + ]</code> 下一题 / 提交</li>
+        <li><code>Cmd/Ctrl + /</code> 问 AI 老师（打开/关闭对话）</li>
+        <li><code>Cmd/Ctrl + S</code> 收藏 / 取消收藏当前题目</li>
+        <li><code>数字 1-8</code> 快速选中选项 A-H</li>
+        <li><code>Enter</code> 提交 / 下一题</li>
+        <li><code>ESC</code> 退出沉浸式刷题模式</li>
+      </ul>
+    </div>
+  </div>
 
   <aside id="chat-panel" class="card" aria-label="AI 对话面板">
     <div id="chat-log"></div>
@@ -235,7 +291,7 @@
       <button id="chat-send">发送</button>
     </div>
   </aside>
-  <button id="open-chat" aria-label="打开 AI 对话">AI</button>
+  <button id="open-chat" aria-label="打开 AI 对话">?</button>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -246,8 +302,11 @@
       const buildBtn = $('build-btn');
       const saveBtn = $('save-btn');
       const showBankBtn = $('show-bank-btn');
+      const showShortcutsBtn = $('show-shortcuts-btn');
+      const shortcutsModal = $('shortcuts-modal');
       const favQuizBtn = $('fav-quiz-btn');
       const manageFavBtn = $('manage-fav-btn');
+      const clearFavBtn = $('clear-fav-btn'); // 绑定清空按钮
       const quizBox = $('quiz-container');
       const qNum = $('q-num');
       const qText = $('question-text');
@@ -257,6 +316,7 @@
       const feedback = $('feedback');
       const favBtn = $('fav-btn');
       const jumpBtn = $('jump-btn');
+      const fullscreenBtn = $('fullscreen-btn');
       const favManager = $('fav-manager');
       const favList = $('fav-list');
       const jumpModal = $('jump-modal');
@@ -416,6 +476,33 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         favBtn.classList.toggle('faved', index === -1);
       }
 
+      function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(err => {
+            notify(`浏览器阻止了全屏`);
+          });
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        }
+      }
+
+      fullscreenBtn.addEventListener('click', toggleFullScreen);
+
+      document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+          document.body.classList.add('immersive');
+          fullscreenBtn.textContent = '✖';
+          fullscreenBtn.title = '退出沉浸模式';
+          notify('已进入沉浸模式，按 ESC 退出');
+        } else {
+          document.body.classList.remove('immersive');
+          fullscreenBtn.textContent = '⛶';
+          fullscreenBtn.title = '进入沉浸模式';
+        }
+      });
+
       function renderQuestion() {
         if (!quiz[current]) return;
         const question = quiz[current];
@@ -429,6 +516,7 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         actionBtn.style.display = 'inline-block';
         favBtn.style.display = 'inline-grid';
         jumpBtn.style.display = 'inline-grid';
+        fullscreenBtn.style.display = 'inline-grid';
 
         const multi = question.answer.length > 1;
         question.options.forEach(([label, text]) => {
@@ -468,7 +556,7 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
 
         if (wasGraded) showFeedback();
         if (explanationCache[current]) {
-          explainBox.innerHTML = explanationCache[current]; // 修复缓存读取使用 innerHTML
+          explainBox.textContent = explanationCache[current];
           explainBtn.style.display = 'inline-block';
         }
       }
@@ -527,10 +615,23 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         prevBtn.style.display = 'none';
         favBtn.style.display = 'none';
         jumpBtn.style.display = 'none';
+        fullscreenBtn.style.display = 'none';
         feedback.textContent = `正确率 ${Math.round((score / quiz.length) * 100)}%`;
         feedback.className = 'feedback correct';
         explainBtn.style.display = 'none';
         explainBox.textContent = '';
+        
+        // 触发撒花特效
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.6 },
+            colors: ['#2563eb', '#0ea5e9', '#16a34a', '#f59e0b', '#7c3aed']
+          });
+        }
+        
+        if (document.fullscreenElement) document.exitFullscreen();
       }
 
       function startQuiz(text, fromFavorites = false) {
@@ -545,14 +646,49 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         Object.keys(explanationCache).forEach(key => delete explanationCache[key]);
         quizBox.style.display = 'block';
         renderQuestion();
-        quizBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if(!document.fullscreenElement) {
+          quizBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
 
       buildBtn.addEventListener('click', () => startQuiz(rawInput.value.trim(), false));
       favQuizBtn.addEventListener('click', () => startQuiz('', true));
 
+      // 全局快捷键监听
       document.addEventListener('keydown', event => {
-        if (document.activeElement === rawInput || document.activeElement === chatInput) return;
+        const isInput = document.activeElement === rawInput || document.activeElement === chatInput;
+
+        if (event.metaKey || event.ctrlKey) {
+          if (event.key.toLowerCase() === 's') {
+            event.preventDefault();
+            if (quizBox.style.display !== 'none' && favBtn.style.display !== 'none') {
+              favBtn.click();
+            }
+            return;
+          }
+          if (event.key === '[') {
+            event.preventDefault();
+            if (quizBox.style.display !== 'none' && prevBtn.style.display !== 'none') {
+              prevBtn.click();
+            }
+            return;
+          }
+          if (event.key === ']') {
+            event.preventDefault();
+            if (quizBox.style.display !== 'none' && actionBtn.style.display !== 'none' && !actionBtn.disabled) {
+              actionBtn.click();
+            }
+            return;
+          }
+          if (event.key === '/') {
+            event.preventDefault();
+            openChat.click();
+            return;
+          }
+        }
+
+        if (isInput) return;
+
         if (event.key >= '1' && event.key <= '8') {
           const index = Number(event.key) - 1;
           const letter = String.fromCharCode('A'.charCodeAt(0) + index);
@@ -567,6 +703,8 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
           if (!actionBtn.disabled && actionBtn.style.display !== 'none') actionBtn.click();
         }
       });
+
+      showShortcutsBtn.addEventListener('click', () => openModal(shortcutsModal));
 
       saveBtn.addEventListener('click', () => {
         const text = rawInput.value.trim();
@@ -659,6 +797,23 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         });
       }
 
+      // 绑定一键清空收藏功能
+      clearFavBtn.addEventListener('click', () => {
+        if (favorites.length === 0) {
+          notify('收藏夹已经是空的啦');
+          return;
+        }
+        if (confirm('确定要清空所有收藏的题目吗？此操作不可恢复。')) {
+          favorites = [];
+          saveStorage('favorites', favorites);
+          updateFavButtons();
+          renderFav();
+          // 如果当前正处于刷题界面，要同步取消星星的高亮
+          if (quiz[current]) favBtn.classList.remove('faved');
+          notify('收藏夹已清空');
+        }
+      });
+
       jumpBtn.addEventListener('click', () => {
         renderJump();
         openModal(jumpModal);
@@ -713,17 +868,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
             const { value, done } = await reader.read();
             if (done) break;
             buffer += decoder.decode(value, { stream: true });
-
-            // 👉 新增：拦截并显示 DeepSeek 的官方报错（如余额不足、Key错误）
-            if (buffer.trim().startsWith('{"error"')) {
-              try {
-                const errData = JSON.parse(buffer);
-                text = `⚠️ DeepSeek 报错: ${errData.error?.message || errData.error?.code || '未知错误'}`;
-                target.innerHTML = `<span style="color:#dc2626; font-weight:bold;">${text}</span>`;
-                return; // 遇到报错直接结束
-              } catch (_) {}
-            }
-
             const parts = buffer.split('\n\n');
             buffer = parts.pop();
             for (const part of parts) {
@@ -736,18 +880,11 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
                 delta = parsed.choices?.[0]?.delta?.content || parsed.error || '';
               } catch (_) {}
               text += delta;
-              
-              // 简单的正则匹配换行和加粗，优化 AI 排版显示
-              target.innerHTML = escapeHtml(text)
-                .replace(/\n/g, '<br>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+              target.textContent = text;
             }
           }
-          if (!text) {
-            target.textContent = '暂无解析内容，请稍后再试。';
-          } else {
-            if (key !== null) explanationCache[key] = target.innerHTML; // 修复缓存存储使用 innerHTML
-          }
+          if (!text) target.textContent = '暂无解析内容，请稍后再试。';
+          if (key !== null) explanationCache[key] = target.textContent;
         } catch (error) {
           target.textContent = error.message || '解析失败，请稍后再试。';
         }
@@ -755,7 +892,7 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
 
       explainBtn.addEventListener('click', () => {
         if (explanationCache[current]) {
-          explainBox.innerHTML = explanationCache[current]; // 修复缓存读取使用 innerHTML
+          explainBox.textContent = explanationCache[current];
           return;
         }
         explainBox.textContent = '解析生成中…';
