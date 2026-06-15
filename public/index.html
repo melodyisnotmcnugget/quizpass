@@ -88,7 +88,7 @@
     .prompt-copy { color: #667085; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; background: none; border: 0; padding: 0; box-shadow: none; font-size: inherit; font-weight: 650; }
     .prompt-copy:hover { color: var(--primary); transform: none; box-shadow: none; }
 
-    textarea {
+    #raw-input {
       display: block;
       width: 100%;
       min-height: 150px;
@@ -104,10 +104,10 @@
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
-    textarea:focus, #chat-input:focus { border-color: rgba(37, 99, 235, 0.45); box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.10); }
+    #raw-input:focus, #chat-input:focus { border-color: rgba(37, 99, 235, 0.45); box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.10); }
 
     /* 让占位符文字变得柔和（25%透明度） */
-    textarea::placeholder {
+    #raw-input::placeholder, #chat-input::placeholder {
       opacity: 0.25;
       color: var(--text);
     }
@@ -184,14 +184,34 @@
     .shortcut-list { padding-left: 20px; line-height: 2.2; color: #344054; font-size: 15px; }
     .shortcut-list code { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: ui-monospace, monospace; color: var(--primary); margin-right: 8px; }
 
-    /* 修改 AI 对话面板位置到右上角 */
+    /* AI 对话面板 */
     #chat-panel { position: fixed; right: 24px; top: 86px; width: min(390px, calc(100vw - 48px)); height: min(560px, calc(100vh - 110px)); display: none; flex-direction: column; z-index: 900; overflow: hidden; }
     #chat-log { flex: 1; overflow: auto; padding: 16px; font-size: 14px; }
     .chat-row { padding: 12px; border-radius: 16px; background: #f8fafc; margin-bottom: 10px; border: 1px solid var(--line); }
-    .chat-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: rgba(255,255,255,0.76); }
-    #chat-input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 11px 14px; outline: none; }
     
-    /* 修改 AI 按钮位置到右上角 */
+    /* 聊天输入框区域（已优化对齐方式） */
+    .chat-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: rgba(255,255,255,0.76); align-items: flex-end; }
+    
+    /* 将原本的 input 样式迁移并强化给 textarea */
+    #chat-input { 
+      flex: 1; 
+      min-width: 0; 
+      border: 1px solid var(--line); 
+      border-radius: 20px; 
+      padding: 10px 14px; 
+      outline: none; 
+      resize: none; /* 禁用用户手动拖拽大小 */
+      font-family: inherit; 
+      font-size: 14px; 
+      line-height: 1.5; 
+      max-height: 120px; /* 最高限制，超出会滚动 */
+      overflow-y: auto; 
+      box-sizing: border-box;
+      background: #ffffff;
+    }
+    
+    #chat-send { flex-shrink: 0; margin-bottom: 2px; }
+
     #open-chat { position: fixed; right: 24px; top: 24px; width: 52px; height: 52px; padding: 0; display: grid; place-items: center; z-index: 901; font-size: 26px; font-family: ui-rounded, system-ui, sans-serif; font-weight: 800; }
 
     .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(24px); opacity: 0; pointer-events: none; z-index: 2000; padding: 12px 16px; border-radius: 999px; background: rgba(17,24,39,0.92); color: #fff; font-weight: 750; transition: opacity .2s ease, transform .2s ease; }
@@ -278,7 +298,8 @@
         <li><code>Cmd/Ctrl + /</code> 问 AI 老师（打开/关闭对话）</li>
         <li><code>Cmd/Ctrl + S</code> 收藏 / 取消收藏当前题目</li>
         <li><code>数字 1-8</code> 快速选中选项 A-H</li>
-        <li><code>Enter</code> 提交 / 下一题</li>
+        <li><code>Enter</code> 提交 / 聊天发送</li>
+        <li><code>Shift + Enter</code> 聊天框内换行</li>
         <li><code>ESC</code> 退出沉浸式刷题模式</li>
       </ul>
     </div>
@@ -287,7 +308,7 @@
   <aside id="chat-panel" class="card" aria-label="AI 对话面板">
     <div id="chat-log"></div>
     <div class="chat-input-row">
-      <input id="chat-input" placeholder="问 AI 解析老师…" autocomplete="off">
+      <textarea id="chat-input" placeholder="问 AI 解析老师…" rows="1" autocomplete="off"></textarea>
       <button id="chat-send">发送</button>
     </div>
   </aside>
@@ -306,7 +327,7 @@
       const shortcutsModal = $('shortcuts-modal');
       const favQuizBtn = $('fav-quiz-btn');
       const manageFavBtn = $('manage-fav-btn');
-      const clearFavBtn = $('clear-fav-btn'); // 绑定清空按钮
+      const clearFavBtn = $('clear-fav-btn');
       const quizBox = $('quiz-container');
       const qNum = $('q-num');
       const qText = $('question-text');
@@ -621,7 +642,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         explainBtn.style.display = 'none';
         explainBox.textContent = '';
         
-        // 触发撒花特效
         if (typeof confetti === 'function') {
           confetti({
             particleCount: 150,
@@ -654,7 +674,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
       buildBtn.addEventListener('click', () => startQuiz(rawInput.value.trim(), false));
       favQuizBtn.addEventListener('click', () => startQuiz('', true));
 
-      // 全局快捷键监听
       document.addEventListener('keydown', event => {
         const isInput = document.activeElement === rawInput || document.activeElement === chatInput;
 
@@ -797,7 +816,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         });
       }
 
-      // 绑定一键清空收藏功能
       clearFavBtn.addEventListener('click', () => {
         if (favorites.length === 0) {
           notify('收藏夹已经是空的啦');
@@ -808,7 +826,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
           saveStorage('favorites', favorites);
           updateFavButtons();
           renderFav();
-          // 如果当前正处于刷题界面，要同步取消星星的高亮
           if (quiz[current]) favBtn.classList.remove('faved');
           notify('收藏夹已清空');
         }
@@ -907,16 +924,35 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         if (chatPanel.style.display === 'flex') chatInput.focus();
       });
 
+      // 聊天输入框自动增高逻辑
+      chatInput.addEventListener('input', function() {
+        this.style.height = 'auto'; // 先重置，以便缩小框时能回弹
+        this.style.height = this.scrollHeight + 'px'; // 根据内容设置新高度
+      });
+
+      // 输入法状态标识
+      let isComposing = false;
+      chatInput.addEventListener('compositionstart', () => { isComposing = true; });
+      chatInput.addEventListener('compositionend', () => { isComposing = false; });
+
       chatSend.addEventListener('click', () => {
         const value = chatInput.value.trim();
         if (!value) return;
         chatInput.value = '';
+        chatInput.style.height = 'auto'; // 发送后恢复原本高度
         chatStream(value);
       });
+
+      // 新的键盘按键监听：处理发送与换行
       chatInput.addEventListener('keydown', event => {
         if (event.key === 'Enter') {
-          event.preventDefault();
-          chatSend.click();
+          if (isComposing) return; // 还在用输入法拼字，不拦截也不发送
+          
+          if (!event.shiftKey) { // 没按 Shift，就是发送
+            event.preventDefault(); // 阻止原生的回车换行
+            chatSend.click();
+          }
+          // 如果按了 Shift，什么都不做，让浏览器正常执行换行操作
         }
       });
 
