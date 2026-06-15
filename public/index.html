@@ -2,7 +2,9 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f8fafc">
   <title>QizzPass</title>
   <link rel="icon" type="image/x-icon" sizes="64x64" href="thumb.ico?v=1">
@@ -68,7 +70,8 @@
     .ghost { color: #1f2937; background: rgba(255,255,255,0.9); border: 1px solid var(--line); box-shadow: none; }
     .ghost-sm { padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 12px; }
 
-    .app-shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 80px; transition: all 0.3s ease; }
+    /* 注入了 env(safe-area-inset-top) 智能避让 iOS 顶部的电池时间区域 */
+    .app-shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: calc(28px + env(safe-area-inset-top, 0px)) 0 80px; transition: all 0.3s ease; }
     .hero { margin-top: 12px; transition: opacity 0.3s ease, height 0.3s ease; }
 
     .card {
@@ -190,23 +193,24 @@
     #chat-log { flex: 1; overflow: auto; padding: 16px; font-size: 14px; position: relative; }
     #chat-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.25; font-weight: 600; font-size: 15px; pointer-events: none; }
     .chat-row { padding: 12px; border-radius: 16px; background: #f8fafc; margin-bottom: 10px; border: 1px solid var(--line); }
-    .chat-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: rgba(255,255,255,0.76); align-items: flex-end; }
+    
+    /* 对话框底部也加入安全距离，防止被 iOS Home 横条遮挡 */
+    .chat-input-row { display: flex; gap: 8px; padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: rgba(255,255,255,0.76); align-items: flex-end; }
     #chat-input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 20px; padding: 10px 14px; outline: none; resize: none; max-height: 120px; overflow-y: auto; background: #ffffff; scrollbar-width: none; }
     #chat-input::-webkit-scrollbar { display: none; }
     #chat-send { flex-shrink: 0; margin-bottom: 2px; }
 
     #mobile-chat-close { display: none; }
-    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(24px); opacity: 0; pointer-events: none; z-index: 2000; padding: 12px 16px; border-radius: 999px; background: rgba(17,24,39,0.92); color: #fff; font-weight: 750; transition: opacity .2s ease, transform .2s ease; }
+    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(24px); opacity: 0; pointer-events: none; z-index: 2000; padding: 12px 16px; border-radius: 999px; background: rgba(17,24,39,0.92); color: #fff; font-weight: 750; transition: opacity .2s ease, transform .2s ease; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* ========== 手机端自动化适配 ========== */
     @media (max-width: 860px) {
-      .app-shell { width: min(100% - 16px, 920px); padding-top: 12px; padding-bottom: 50vh; }
+      .app-shell { width: min(100% - 16px, 920px); padding-top: calc(12px + env(safe-area-inset-top, 0px)); padding-bottom: 50vh; }
       .composer, #quiz-container { border-radius: 20px; padding: 16px; }
       .quiz-top { flex-direction: column; gap: 12px; }
       #top-btns { width: 100%; justify-content: flex-end; overflow-x: auto; padding-bottom: 4px; }
       
-      /* 让解析按钮霸占最左侧，剩下的全往右边靠！ */
       #explainBtn { margin-right: auto; }
 
       .quiz-actions { display: flex; width: 100%; gap: 12px; justify-content: space-between; }
@@ -233,7 +237,7 @@
       }
       
       .modal-backdrop { padding: 10px; align-items: flex-end; }
-      .modal { margin: 0 0 20px 0; border-radius: 24px; padding: 20px; }
+      .modal { margin: 0 0 calc(20px + env(safe-area-inset-bottom, 0px)) 0; border-radius: 24px; padding: 20px; }
     }
   </style>
 </head>
@@ -516,8 +520,14 @@
         qText.textContent = question.question;
         optsArea.innerHTML = ''; feedback.textContent = ''; feedback.className = 'feedback';
         explainBox.textContent = ''; explainBtn.style.display = 'none';
-        actionBtn.style.display = 'inline-block'; favBtn.style.display = 'inline-grid';
-        jumpBtn.style.display = 'inline-grid'; fullscreenBtn.style.display = 'inline-grid';
+        
+        // 当进入新题目时，恢复这些按钮的显示状态
+        actionBtn.style.display = 'inline-block'; 
+        favBtn.style.display = 'inline-grid';
+        jumpBtn.style.display = 'inline-grid'; 
+        fullscreenBtn.style.display = 'inline-grid';
+        // 将 mobile-open-chat 样式设为空，让它恢复被 CSS 控制的默认状态（手机端显示，电脑端隐藏）
+        mobileOpenChat.style.display = '';
 
         const multi = question.answer.length > 1;
         question.options.forEach(([label, text]) => {
@@ -582,9 +592,13 @@
       function endQuiz() {
         const score = quiz.reduce((sum, q, i) => sum + (isSameSet(userChoices[i], q.answer) ? 1 : 0), 0);
         qNum.textContent = '练习完成'; qText.textContent = `得分 ${score} / ${quiz.length}`;
-        optsArea.innerHTML = ''; actionBtn.style.display = 'none'; prevBtn.style.display = 'none';
+        optsArea.innerHTML = ''; 
+        // 结算成绩后，隐藏除 feedback 以外的多余交互按钮
+        actionBtn.style.display = 'none'; prevBtn.style.display = 'none';
         favBtn.style.display = 'none'; jumpBtn.style.display = 'none'; fullscreenBtn.style.display = 'none';
         explainBtn.style.display = 'none'; explainBox.textContent = '';
+        mobileOpenChat.style.display = 'none'; // 强制在手机端的得分页隐藏问号
+
         feedback.textContent = `正确率 ${Math.round((score / quiz.length) * 100)}%`; feedback.className = 'feedback correct';
         
         if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#47AFEB', '#16a34a', '#f59e0b', '#7c3aed'] });
