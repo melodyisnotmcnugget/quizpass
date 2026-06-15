@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#f8fafc">
   <title>QizzPass</title>
   <link rel="icon" type="image/x-icon" sizes="64x64" href="thumb.ico?v=1">
@@ -61,7 +61,13 @@
       transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
     }
 
-    button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(37, 99, 235, 0.24); }
+    /* 将所有悬浮特效隔离，仅限支持鼠标的电脑端使用，防止手机端“粘滞” */
+    @media (hover: hover) {
+      button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(37, 99, 235, 0.24); }
+      .option:hover { transform: translateY(-1px); border-color: rgba(37,99,235,0.32); background: #ffffff; }
+      .prompt-copy:hover { color: var(--primary); transform: none; box-shadow: none; }
+    }
+
     button:active:not(:disabled) { transform: translateY(0); }
     button:disabled { cursor: not-allowed; opacity: 0.48; box-shadow: none; }
 
@@ -86,7 +92,6 @@
     .muted { color: var(--muted); margin: 5px 0 0; font-size: 14px; }
     .prompt-hint { margin: 8px 0 0; color: #98a2b3; font-size: 12px; line-height: 1.5; }
     .prompt-copy { color: #667085; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; background: none; border: 0; padding: 0; box-shadow: none; font-size: inherit; font-weight: 650; }
-    .prompt-copy:hover { color: var(--primary); transform: none; box-shadow: none; }
 
     #raw-input {
       display: block;
@@ -142,7 +147,6 @@
       font-size: 16px;
       transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease, padding 0.3s ease, font-size 0.3s ease;
     }
-    .option:hover { transform: translateY(-1px); border-color: rgba(37,99,235,0.32); background: #ffffff; }
     .option:has(input:checked) { border-color: rgba(37,99,235,0.62); background: #eff6ff; }
     .option input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--primary); }
     .option strong { margin-right: 4px; color: #1d4ed8; }
@@ -183,23 +187,10 @@
     .shortcut-list { padding-left: 20px; line-height: 2.2; color: #344054; font-size: 15px; }
     .shortcut-list code { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: ui-monospace, monospace; color: var(--primary); margin-right: 8px; }
 
+    /* AI 对话面板（电脑端排版） */
     #chat-panel { position: fixed; right: 24px; top: 86px; width: min(390px, calc(100vw - 48px)); height: min(560px, calc(100vh - 110px)); display: none; flex-direction: column; z-index: 900; overflow: hidden; }
-    
-    /* 对话记录区，增加相对定位给占位符使用 */
     #chat-log { flex: 1; overflow: auto; padding: 16px; font-size: 14px; position: relative; }
-    
-    /* 聊天空白时的占位提示 */
-    #chat-placeholder {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      opacity: 0.25;
-      font-weight: 600;
-      font-size: 15px;
-      pointer-events: none; /* 防止遮挡鼠标操作 */
-    }
-
+    #chat-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.25; font-weight: 600; font-size: 15px; pointer-events: none; }
     .chat-row { padding: 12px; border-radius: 16px; background: #f8fafc; margin-bottom: 10px; border: 1px solid var(--line); }
     .chat-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: rgba(255,255,255,0.76); align-items: flex-end; }
     
@@ -218,26 +209,53 @@
       overflow-y: auto; 
       box-sizing: border-box;
       background: #ffffff;
-      /* 隐藏火狐和IE的滚动条 */
       scrollbar-width: none; 
       -ms-overflow-style: none; 
     }
-    
-    /* 彻底隐藏 Webkit (Chrome/Safari/Edge) 的滚动条，但依然可以滚动 */
     #chat-input::-webkit-scrollbar { display: none; }
-    
     #chat-send { flex-shrink: 0; margin-bottom: 2px; }
 
+    /* AI 按钮（电脑端右上角） */
     #open-chat { position: fixed; right: 24px; top: 24px; width: 52px; height: 52px; padding: 0; display: grid; place-items: center; z-index: 901; font-size: 26px; font-family: ui-rounded, system-ui, sans-serif; font-weight: 800; }
 
     .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(24px); opacity: 0; pointer-events: none; z-index: 2000; padding: 12px 16px; border-radius: 999px; background: rgba(17,24,39,0.92); color: #fff; font-weight: 750; transition: opacity .2s ease, transform .2s ease; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    @media (max-width: 860px) {
-      .app-shell { width: min(100% - 22px, 920px); padding-top: 16px; }
-      .composer, #quiz-container { border-radius: 24px; }
-      .quiz-top { flex-direction: column; }
+    /* =========================================
+       手机端专属响应式排版 (宽小于 600px 时自动激活) 
+       ========================================= */
+    @media (max-width: 600px) {
+      .app-shell { width: 100%; padding: 12px 12px 90px 12px; }
+      .composer, #quiz-container { border-radius: 20px; padding: 18px; }
+      
+      /* 手机端题干紧凑化 */
+      .quiz-top { flex-direction: column; gap: 12px; }
       #top-btns { width: 100%; justify-content: flex-end; }
+
+      /* 按钮阵列重排：主按钮占满一行，次按钮两两并排 */
+      .actions { justify-content: space-between; gap: 8px; }
+      .actions button { flex: 1 1 calc(50% - 4px); text-align: center; padding: 12px 0; }
+      #build-btn { flex: 1 1 100%; }
+
+      /* 手机端弹窗：从底部升起，最大化利用空间 */
+      .modal { width: 100%; margin-top: auto; border-radius: 28px 28px 0 0; padding: 24px 20px 40px; }
+      .modal-backdrop.open { place-items: end center; padding: 0; }
+      
+      /* 手机端 AI 按钮：移至右下角，方便大拇指单手操作 */
+      #open-chat { top: auto; bottom: 24px; right: 20px; width: 56px; height: 56px; box-shadow: 0 8px 24px rgba(37,99,235,0.35); }
+
+      /* 手机端 AI 面板：变成从屏幕底部升起的“大抽屉” */
+      #chat-panel { 
+        top: auto; 
+        bottom: 0; 
+        right: 0; 
+        width: 100%; 
+        height: 75vh; /* 占据屏幕 75% 高度 */
+        border-radius: 28px 28px 0 0; 
+        border: none; 
+        border-top: 1px solid var(--line); 
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
+      }
     }
   </style>
 </head>
@@ -366,7 +384,7 @@
       const explainBox = $('explainBox');
       const chatPanel = $('chat-panel');
       const chatLog = $('chat-log');
-      const chatPlaceholder = $('chat-placeholder'); // 拿到占位符
+      const chatPlaceholder = $('chat-placeholder');
       const chatInput = $('chat-input');
       const chatSend = $('chat-send');
       const openChat = $('open-chat');
@@ -972,7 +990,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
       });
 
       async function chatStream(message) {
-        // 如果占位符还在，发送第一条消息时把它藏起来
         if (chatPlaceholder) {
           chatPlaceholder.style.display = 'none';
         }
