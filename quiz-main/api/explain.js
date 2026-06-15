@@ -1,16 +1,6 @@
 const https = require('https');
 
 module.exports = (req, res) => {
-  // 1. 加上这三行 CORS 头，告诉浏览器“我允许 Netlify 访问我”
-  res.setHeader('Access-Control-Allow-Origin', 'https://qizzpass.netlify.app'); 
-  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  // 2. 处理浏览器的“预检”请求 (Preflight)
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
   if (req.method !== 'POST') return res.status(405).end();
 
   // 解析 JSON body
