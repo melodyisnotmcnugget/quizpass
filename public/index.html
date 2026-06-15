@@ -18,29 +18,25 @@
       --text: #172033;
       --muted: #667085;
       --line: rgba(15, 23, 42, 0.1);
-      --primary: #2563eb;
-      --primary-2: #0ea5e9;
+      /* 统一换成你指定的 8DD5FF 色号，全面废除渐变 */
+      --primary: #8DD5FF; 
       --success: #16a34a;
-      --danger: #dc2626;
-      --warning: #f59e0b;
       --shadow: 0 24px 70px rgba(15, 23, 42, 0.10);
       --radius-lg: 28px;
-      --radius-md: 18px;
-      --radius-sm: 12px;
     }
 
-    * { box-sizing: border-box; }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
       color: var(--text);
+      /* 全局蓝调背景均同步更新为新色号 */
       background:
-        radial-gradient(circle at 12% 12%, rgba(37, 99, 235, 0.16), transparent 30%),
-        radial-gradient(circle at 86% 0%, rgba(14, 165, 233, 0.18), transparent 32%),
+        radial-gradient(circle at 12% 12%, rgba(141, 213, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 86% 0%, rgba(141, 213, 255, 0.18), transparent 32%),
         linear-gradient(180deg, #ffffff 0%, var(--bg) 42%, #eef4ff 100%);
       line-height: 1.6;
       transition: background 0.3s ease;
@@ -48,31 +44,36 @@
 
     button, input, textarea { font: inherit; }
 
+    /* 核心主动作按钮采用无渐变扁平极简风 */
     button {
       border: 0;
       border-radius: 999px;
       padding: 11px 18px;
       color: #ffffff;
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      background: var(--primary);
       cursor: pointer;
       font-weight: 700;
       letter-spacing: -0.01em;
-      box-shadow: 0 12px 22px rgba(37, 99, 235, 0.18);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+      box-shadow: 0 12px 22px rgba(141, 213, 255, 0.18);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
     }
 
-    /* 将所有悬浮特效隔离，仅限支持鼠标的电脑端使用，防止手机端“粘滞” */
-    @media (hover: hover) {
-      button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(37, 99, 235, 0.24); }
-      .option:hover { transform: translateY(-1px); border-color: rgba(37,99,235,0.32); background: #ffffff; }
-      .prompt-copy:hover { color: var(--primary); transform: none; box-shadow: none; }
-    }
-
-    button:active:not(:disabled) { transform: translateY(0); }
     button:disabled { cursor: not-allowed; opacity: 0.48; box-shadow: none; }
 
-    .app-shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 80px; transition: all 0.3s ease; }
+    /* 电脑端 hover 反馈 */
+    @media (hover: hover) {
+      button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(141, 213, 255, 0.24); }
+      .option:hover { transform: translateY(-1px); border-color: rgba(141,213,255,0.32); background: #ffffff; }
+      .prompt-copy:hover { color: var(--primary); }
+    }
 
+    button:active:not(:disabled) { transform: translateY(0); box-shadow: 0 4px 10px rgba(141, 213, 255, 0.1); }
+
+    /* 极简幽灵按钮 */
+    .ghost { color: #1f2937; background: rgba(255,255,255,0.9); border: 1px solid var(--line); box-shadow: none; }
+    .ghost-sm { padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 12px; }
+
+    .app-shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 80px; transition: all 0.3s ease; }
     .hero { margin-top: 12px; transition: opacity 0.3s ease, height 0.3s ease; }
 
     .card {
@@ -82,74 +83,48 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(22px) saturate(150%);
       -webkit-backdrop-filter: blur(22px) saturate(150%);
-      transition: all 0.3s ease;
     }
 
     .composer { padding: 20px; }
     .composer-header { margin-bottom: 14px; }
     .title-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .composer h2, .quiz-title h2, .modal h2 { margin: 0; letter-spacing: -0.035em; line-height: 1.1; }
-    .muted { color: var(--muted); margin: 5px 0 0; font-size: 14px; }
     .prompt-hint { margin: 8px 0 0; color: #98a2b3; font-size: 12px; line-height: 1.5; }
     .prompt-copy { color: #667085; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; background: none; border: 0; padding: 0; box-shadow: none; font-size: inherit; font-weight: 650; }
 
     #raw-input {
-      display: block;
-      width: 100%;
-      min-height: 150px;
-      resize: vertical;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      outline: none;
-      background: rgba(255,255,255,0.88);
-      color: var(--text);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 14px;
+      display: block; width: 100%; min-height: 150px; resize: vertical; padding: 18px;
+      border: 1px solid var(--line); border-radius: 22px; outline: none;
+      background: rgba(255,255,255,0.88); color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, monospace; font-size: 14px;
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
     }
-
-    #raw-input:focus, #chat-input:focus { border-color: rgba(37, 99, 235, 0.45); box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.10); }
-
-    #raw-input::placeholder, #chat-input::placeholder {
-      opacity: 0.25;
-      color: var(--text);
-    }
+    #raw-input:focus, #chat-input:focus { border-color: rgba(141, 213, 255, 0.45); box-shadow: 0 0 0 5px rgba(141, 213, 255, 0.10); }
+    #raw-input::placeholder, #chat-input::placeholder { opacity: 0.25; color: var(--text); }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-    .secondary { background: #111827; box-shadow: 0 12px 22px rgba(17, 24, 39, 0.14); }
-    .ghost { color: #1f2937; background: rgba(255,255,255,0.9); border: 1px solid var(--line); box-shadow: none; }
-    .ghost-sm { padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 12px; }
-    .success-btn { background: linear-gradient(135deg, #16a34a, #22c55e); }
-    .purple-btn { background: linear-gradient(135deg, #7c3aed, #a855f7); }
-    .danger-btn { background: linear-gradient(135deg, #dc2626, #f97316); }
 
     #quiz-container { display: none; margin-top: 24px; padding: 24px; position: relative; }
     .quiz-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
     .quiz-title { min-width: 0; }
-    #q-num { color: #1d4ed8; font-weight: 850; font-size: 14px; margin-bottom: 6px; }
-    #question-text { margin: 0; font-size: clamp(21px, 3vw, 32px); font-weight: 850; line-height: 1.25; letter-spacing: -0.04em; transition: font-size 0.3s ease; }
+    #q-num { color: var(--primary); font-weight: 850; font-size: 14px; margin-bottom: 6px; }
+    #question-text { margin: 0; font-size: clamp(21px, 3vw, 32px); font-weight: 850; line-height: 1.25; letter-spacing: -0.04em; }
+    
     #top-btns { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
     .icon-btn { width: 44px; height: 44px; padding: 0; display: inline-grid; place-items: center; color: #1f2937; background: rgba(255,255,255,0.92); border: 1px solid var(--line); box-shadow: none; font-size: 18px; }
+    .icon-btn.text-icon { width: auto; padding: 0 16px; font-size: 15px; font-weight: 750; }
     .icon-btn.faved { color: #d97706; background: #fff7ed; border-color: rgba(245, 158, 11, 0.35); }
 
-    #options-area { display: grid; gap: 12px; margin: 20px 0; transition: gap 0.3s ease; }
+    #options-area { display: grid; gap: 12px; margin: 20px 0; }
     .option {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 13px;
-      align-items: flex-start;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,255,255,0.78);
-      cursor: pointer;
-      font-size: 16px;
-      transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease, padding 0.3s ease, font-size 0.3s ease;
+      display: grid; grid-template-columns: auto 1fr; gap: 13px; align-items: flex-start;
+      padding: 16px; border: 1px solid var(--line); border-radius: 18px;
+      background: rgba(255,255,255,0.78); cursor: pointer; font-size: 16px;
+      transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
     }
-    .option:has(input:checked) { border-color: rgba(37,99,235,0.62); background: #eff6ff; }
+    .option:has(input:checked) { border-color: rgba(141,213,255,0.62); background: #eff6ff; }
     .option input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--primary); }
-    .option strong { margin-right: 4px; color: #1d4ed8; }
+    .option strong { margin-right: 4px; color: var(--primary); }
 
     .quiz-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
     .feedback { margin: 16px 0 0; padding: 14px 16px; border-radius: 16px; font-weight: 800; display: none; }
@@ -164,9 +139,7 @@
     body.immersive .app-shell { width: 100%; max-width: 100%; padding: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     body.immersive #quiz-container { width: 100%; max-width: 1000px; margin: 0; min-height: 100vh; border-radius: 0; border: none; padding: 6vh 5vw; display: flex; flex-direction: column; justify-content: center; background: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
     body.immersive #question-text { font-size: clamp(26px, 4vw, 40px); margin-bottom: 10px; }
-    body.immersive #options-area { gap: 18px; margin: 30px 0; }
     body.immersive .option { padding: 22px 24px; font-size: 18px; border-radius: 22px; }
-    body.immersive .option input { width: 22px; height: 22px; }
 
     .modal-backdrop { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(15, 23, 42, 0.38); backdrop-filter: blur(8px); padding: 22px; overflow: auto; }
     .modal-backdrop.open { display: grid; place-items: start center; }
@@ -181,81 +154,73 @@
 
     .jump-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 10px; }
     .jump-grid button { border-radius: 14px; background: #e5e7eb; color: #111827; box-shadow: none; }
-    .jump-grid button.done { background: #dbeafe; color: #1d4ed8; }
-    .jump-grid button.current { outline: 3px solid rgba(37,99,235,0.25); background: var(--primary); color: #ffffff; }
+    .jump-grid button.done { background: #dbeafe; color: var(--primary); }
+    .jump-grid button.current { outline: 3px solid rgba(141,213,255,0.25); background: var(--primary); color: #ffffff; }
     
     .shortcut-list { padding-left: 20px; line-height: 2.2; color: #344054; font-size: 15px; }
     .shortcut-list code { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: ui-monospace, monospace; color: var(--primary); margin-right: 8px; }
 
-    /* AI 对话面板（电脑端排版） */
+    /* AI 球（干净定位） */
+    #ai-wrapper {
+      position: fixed; right: 24px; top: 24px; z-index: 901;
+      display: flex; flex-direction: column; align-items: flex-end;
+    }
+    #open-chat {
+      width: 52px; height: 52px; padding: 0; display: grid; place-items: center;
+      font-size: 26px; font-family: ui-rounded, system-ui, sans-serif; font-weight: 800;
+      box-shadow: 0 8px 20px rgba(141,213,255,0.25);
+    }
+    
+    /* 对话框的主体与内部设计 */
     #chat-panel { position: fixed; right: 24px; top: 86px; width: min(390px, calc(100vw - 48px)); height: min(560px, calc(100vh - 110px)); display: none; flex-direction: column; z-index: 900; overflow: hidden; }
     #chat-log { flex: 1; overflow: auto; padding: 16px; font-size: 14px; position: relative; }
     #chat-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.25; font-weight: 600; font-size: 15px; pointer-events: none; }
     .chat-row { padding: 12px; border-radius: 16px; background: #f8fafc; margin-bottom: 10px; border: 1px solid var(--line); }
     .chat-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: rgba(255,255,255,0.76); align-items: flex-end; }
-    
-    #chat-input { 
-      flex: 1; 
-      min-width: 0; 
-      border: 1px solid var(--line); 
-      border-radius: 20px; 
-      padding: 10px 14px; 
-      outline: none; 
-      resize: none; 
-      font-family: inherit; 
-      font-size: 14px; 
-      line-height: 1.5; 
-      max-height: 120px; 
-      overflow-y: auto; 
-      box-sizing: border-box;
-      background: #ffffff;
-      scrollbar-width: none; 
-      -ms-overflow-style: none; 
-    }
+    #chat-input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 20px; padding: 10px 14px; outline: none; resize: none; max-height: 120px; overflow-y: auto; background: #ffffff; scrollbar-width: none; }
     #chat-input::-webkit-scrollbar { display: none; }
     #chat-send { flex-shrink: 0; margin-bottom: 2px; }
 
-    /* AI 按钮（电脑端右上角） */
-    #open-chat { position: fixed; right: 24px; top: 24px; width: 52px; height: 52px; padding: 0; display: grid; place-items: center; z-index: 901; font-size: 26px; font-family: ui-rounded, system-ui, sans-serif; font-weight: 800; }
+    /* 专门给手机端对话框加的内部关闭键（电脑上隐形） */
+    #mobile-chat-close { display: none; }
 
     .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(24px); opacity: 0; pointer-events: none; z-index: 2000; padding: 12px 16px; border-radius: 999px; background: rgba(17,24,39,0.92); color: #fff; font-weight: 750; transition: opacity .2s ease, transform .2s ease; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* =========================================
-       手机端专属响应式排版 (宽小于 600px 时自动激活) 
-       ========================================= */
-    @media (max-width: 600px) {
-      .app-shell { width: 100%; padding: 12px 12px 90px 12px; }
-      .composer, #quiz-container { border-radius: 20px; padding: 18px; }
-      
-      /* 手机端题干紧凑化 */
+    /* ========== 手机端自动化适配响应样式 ========== */
+    @media (max-width: 860px) {
+      .app-shell { width: min(100% - 16px, 920px); padding-top: 12px; }
+      .composer, #quiz-container { border-radius: 20px; padding: 16px; }
       .quiz-top { flex-direction: column; gap: 12px; }
-      #top-btns { width: 100%; justify-content: flex-end; }
-
-      /* 按钮阵列重排：主按钮占满一行，次按钮两两并排 */
-      .actions { justify-content: space-between; gap: 8px; }
-      .actions button { flex: 1 1 calc(50% - 4px); text-align: center; padding: 12px 0; }
-      #build-btn { flex: 1 1 100%; }
-
-      /* 手机端弹窗：从底部升起，最大化利用空间 */
-      .modal { width: 100%; margin-top: auto; border-radius: 28px 28px 0 0; padding: 24px 20px 40px; }
-      .modal-backdrop.open { place-items: end center; padding: 0; }
+      #top-btns { width: 100%; justify-content: flex-end; overflow-x: auto; padding-bottom: 4px; }
       
-      /* 手机端 AI 按钮：移至右下角，方便大拇指单手操作 */
-      #open-chat { top: auto; bottom: 24px; right: 20px; width: 56px; height: 56px; box-shadow: 0 8px 24px rgba(37,99,235,0.35); }
+      .quiz-actions { display: flex; width: 100%; gap: 12px; justify-content: space-between; }
+      #prev-btn { flex: 1; margin: 0; text-align: center; }
+      #action-btn { flex: 1; margin: 0; text-align: center; width: 100%; }
 
-      /* 手机端 AI 面板：变成从屏幕底部升起的“大抽屉” */
-      #chat-panel { 
-        top: auto; 
-        bottom: 0; 
-        right: 0; 
-        width: 100%; 
-        height: 75vh; /* 占据屏幕 75% 高度 */
-        border-radius: 28px 28px 0 0; 
-        border: none; 
-        border-top: 1px solid var(--line); 
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.15); 
+      /* AI 球移动端下沉 */
+      #ai-wrapper { top: auto; bottom: 24px; right: 24px; }
+
+      /* 移动端弹出面板形态转换：底部全屏式抽屉 */
+      #chat-panel {
+        top: auto; bottom: 0; right: 0; left: 0;
+        width: 100%; height: 75vh;
+        border-radius: 24px 24px 0 0;
+        border-bottom: none;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
       }
+
+      /* 移动端专属：在面板头部里面长出一个极简灰 ✕ 关闭按钮 */
+      #mobile-chat-close {
+        display: grid; place-items: center;
+        position: absolute; top: 14px; right: 18px; z-index: 10;
+        width: 24px; height: 24px; border-radius: 50%;
+        background: #e2e8f0; color: #475569;
+        font-size: 12px; font-weight: 800; cursor: pointer;
+      }
+      
+      .modal-backdrop { padding: 10px; align-items: flex-end; }
+      .modal { margin: 0 0 20px 0; border-radius: 24px; padding: 20px; }
     }
   </style>
 </head>
@@ -273,10 +238,10 @@
         <textarea id="raw-input" placeholder="示例：&#10;1. HTML 的全称是什么？&#10;A. Hyper Text Markup Language&#10;B. High Text Machine Language&#10;*A"></textarea>
         <div class="actions">
           <button id="build-btn">生成刷题</button>
-          <button id="save-btn" class="secondary">保存题库</button>
+          <button id="save-btn" class="ghost">保存题库</button>
           <button id="show-bank-btn" class="ghost">题库</button>
-          <button id="fav-quiz-btn" class="success-btn" style="display:none">刷收藏题</button>
-          <button id="manage-fav-btn" class="purple-btn" style="display:none">管理收藏夹</button>
+          <button id="fav-quiz-btn" class="ghost" style="display:none">刷收藏题</button>
+          <button id="manage-fav-btn" class="ghost" style="display:none">管理收藏夹</button>
         </div>
       </section>
     </section>
@@ -288,6 +253,7 @@
           <p id="question-text"></p>
         </div>
         <div id="top-btns">
+          <button id="explainBtn" class="icon-btn text-icon" style="display:none">解析</button>
           <button id="fullscreen-btn" class="icon-btn" title="进入沉浸式刷题" aria-label="沉浸模式">⛶</button>
           <button id="jump-btn" class="icon-btn" title="题号导航" aria-label="题号导航">⌘</button>
           <button id="fav-btn" class="icon-btn" title="收藏/取消收藏 (Cmd+S)" aria-label="收藏/取消收藏">★</button>
@@ -297,7 +263,6 @@
       <div class="quiz-actions">
         <button id="prev-btn" class="ghost" style="display:none">上一题</button>
         <button id="action-btn" disabled>提交</button>
-        <button id="explainBtn" class="success-btn" style="display:none">生成解析</button>
       </div>
       <p id="feedback" class="feedback"></p>
       <pre id="explainBox"></pre>
@@ -309,7 +274,7 @@
       <div class="modal-head">
         <h2>收藏夹</h2>
         <div class="mini-actions">
-          <button id="clear-fav-btn" class="danger-btn">清空全部</button>
+          <button id="clear-fav-btn" class="ghost">清空全部</button>
           <button class="ghost" data-close="fav-manager">关闭</button>
         </div>
       </div>
@@ -340,15 +305,18 @@
   </div>
 
   <aside id="chat-panel" class="card" aria-label="AI 对话面板">
-    <div id="chat-log">
-      <div id="chat-placeholder">提出任意问题...</div>
-    </div>
+    <div id="mobile-chat-close">✕</div>
+    <div id="chat-log"><div id="chat-placeholder">提出任意问题...</div></div>
     <div class="chat-input-row">
       <textarea id="chat-input" placeholder="问 AI 解析老师…" rows="1" autocomplete="off"></textarea>
       <button id="chat-send">发送</button>
     </div>
   </aside>
-  <button id="open-chat" aria-label="打开 AI 对话">?</button>
+  
+  <div id="ai-wrapper">
+    <button id="open-chat" aria-label="打开 AI 对话">?</button>
+  </div>
+  
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -388,6 +356,8 @@
       const chatInput = $('chat-input');
       const chatSend = $('chat-send');
       const openChat = $('open-chat');
+      const mobileChatClose = $('mobile-chat-close'); // 绑定手机专用关闭键
+      const aiWrapper = $('ai-wrapper');
       const toast = $('toast');
 
       let quiz = [];
@@ -402,9 +372,7 @@
         try {
           const value = JSON.parse(localStorage.getItem(key) || 'null');
           return Array.isArray(value) ? value : fallback;
-        } catch (_) {
-          return fallback;
-        }
+        } catch (_) { return fallback; }
       }
 
       function notify(message) {
@@ -416,35 +384,10 @@
 
       const saveStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
       const normalizeLetter = letter => String(letter || '').replace(/[Ａ-Ｈ]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 65248)).toUpperCase();
-      
-      const normalizeQuestion = q => {
-        return String(q || '')
-          .trim()
-          .replace(/^\s*(?:\[?\d+\]?|【?\d+】?|\(?\d+\)?)\s*[．\.,，、\s)]\s*/, '');
-      };
-
+      const normalizeQuestion = q => String(q || '').trim().replace(/^\s*(?:\[?\d+\]?|【?\d+】?|\(?\d+\)?)\s*[．\.,，、\s)]\s*/, '');
       const isSameSet = (a = [], b = []) => [...a].sort().join('') === [...b].sort().join('');
-      const formatPrompt = `帮我把题库整理一下，按照
-
-1.世界上最高的山峰是什么？
-
-A. 乔戈里峰
-
-B. 珠穆朗玛峰
-
-C. 乞力马扎罗山
-
-*B
-
-
-
-2.以下哪些属于计算机的输入设备？（多选）
-
-A. 鼠标 B. 键盘 C. 显示器 D. 打印机
-
-*AB
-
-这样的格式重新生成，星号后面只要正确答案`;
+      
+      const formatPrompt = `帮我把题库整理一下，按照\n1.世界上最高的山峰是什么？\nA. 乔戈里峰\nB. 珠穆朗玛峰\nC. 乞力马扎罗山\n*B\n\n2.以下哪些属于计算机的输入设备？（多选）\nA. 鼠标 B. 键盘 C. 显示器 D. 打印机\n*AB\n这样的格式重新生成，星号后面只要正确答案`;
 
       copyPromptBtn.addEventListener('click', async () => {
         try {
@@ -453,12 +396,8 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         } catch (_) {
           const helper = document.createElement('textarea');
           helper.value = formatPrompt;
-          helper.style.position = 'fixed';
-          helper.style.opacity = '0';
-          document.body.appendChild(helper);
-          helper.select();
-          document.execCommand('copy');
-          helper.remove();
+          helper.style.position = 'fixed'; helper.style.opacity = '0';
+          document.body.appendChild(helper); helper.select(); document.execCommand('copy'); helper.remove();
           notify('Prompt 已复制');
         }
       });
@@ -480,39 +419,30 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
           currentQuestion.question = normalizeQuestion(currentQuestion.question);
           currentQuestion.answer = [...new Set(currentQuestion.answer.map(normalizeLetter).filter(Boolean))];
           currentQuestion.options = currentQuestion.options.filter(([label]) => label);
-          if (currentQuestion.question && currentQuestion.options.length && currentQuestion.answer.length) {
-            result.push(currentQuestion);
-          }
+          if (currentQuestion.question && currentQuestion.options.length && currentQuestion.answer.length) result.push(currentQuestion);
         };
 
         for (const rawLine of lines) {
           const line = rawLine.trim();
           if (!line) continue;
-
           const answerMatch = line.match(/^\*\s*([A-HＡ-Ｈ]+)/i) || line.match(/^(?:答案|正确答案)[:：]\s*([A-HＡ-Ｈ\s,，、]+)/i);
           if (answerMatch && currentQuestion) {
-            const pureLetters = answerMatch[1].replace(/[\s,，、]+/g, '').split('');
-            currentQuestion.answer = pureLetters;
+            currentQuestion.answer = answerMatch[1].replace(/[\s,，、]+/g, '').split('');
             continue;
           }
-
           const optionMatches = [...line.matchAll(/([A-HＡ-Ｈ])\s*[\.．、\s)]\s*([^A-HＡ-Ｈ]*?)(?=\s+[A-HＡ-Ｈ]\s*[\.．、\s)]|$)/gi)];
           if (optionMatches.length) {
             if (!currentQuestion) currentQuestion = { question: '', options: [], answer: [] };
             optionMatches.forEach(match => {
-              const label = normalizeLetter(match[1]);
-              const optionText = match[2].trim();
+              const label = normalizeLetter(match[1]), optionText = match[2].trim();
               if (label && optionText) currentQuestion.options.push([label, optionText]);
             });
             continue;
           }
-
           pushQuestion();
           currentQuestion = { question: line, options: [], answer: [] };
         }
-
-        pushQuestion();
-        return result;
+        pushQuestion(); return result;
       }
 
       function isFav(question) {
@@ -522,32 +452,35 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
 
       function toggleFav(question) {
         const index = favorites.findIndex(item => item.question === question.question);
-        if (index > -1) {
-          favorites.splice(index, 1);
-          notify('已取消收藏');
-        } else {
-          favorites.push(structuredClone(question));
-          notify('已收藏');
-        }
-        saveStorage('favorites', favorites);
-        updateFavButtons();
+        if (index > -1) { favorites.splice(index, 1); notify('已取消收藏'); } 
+        else { favorites.push(structuredClone(question)); notify('已收藏'); }
+        saveStorage('favorites', favorites); updateFavButtons();
         favBtn.classList.toggle('faved', index === -1);
       }
 
       function toggleFullScreen() {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(err => {
-            notify(`浏览器阻止了全屏`);
-          });
+        const isMobile = window.innerWidth <= 860;
+        if (isMobile) {
+          document.body.classList.toggle('immersive');
+          if (document.body.classList.contains('immersive')) {
+            fullscreenBtn.textContent = '✖';
+            fullscreenBtn.title = '退出沉浸模式';
+            notify('已进入沉浸模式');
+            window.scrollTo(0,0);
+          } else {
+            fullscreenBtn.textContent = '⛶';
+            fullscreenBtn.title = '进入沉浸模式';
+          }
         } else {
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => notify(`浏览器阻止了全屏`));
+          } else {
+            if (document.exitFullscreen) document.exitFullscreen();
           }
         }
       }
 
       fullscreenBtn.addEventListener('click', toggleFullScreen);
-
       document.addEventListener('fullscreenchange', () => {
         if (document.fullscreenElement) {
           document.body.classList.add('immersive');
@@ -566,146 +499,91 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
         const question = quiz[current];
         qNum.textContent = `题目 ${current + 1} / ${quiz.length}`;
         qText.textContent = question.question;
-        optsArea.innerHTML = '';
-        feedback.textContent = '';
-        feedback.className = 'feedback';
-        explainBox.textContent = '';
-        explainBtn.style.display = 'none';
-        actionBtn.style.display = 'inline-block';
-        favBtn.style.display = 'inline-grid';
-        jumpBtn.style.display = 'inline-grid';
-        fullscreenBtn.style.display = 'inline-grid';
+        optsArea.innerHTML = ''; feedback.textContent = ''; feedback.className = 'feedback';
+        explainBox.textContent = ''; explainBtn.style.display = 'none';
+        actionBtn.style.display = 'inline-block'; favBtn.style.display = 'inline-grid';
+        jumpBtn.style.display = 'inline-grid'; fullscreenBtn.style.display = 'inline-grid';
 
         const multi = question.answer.length > 1;
         question.options.forEach(([label, text]) => {
-          const option = document.createElement('label');
-          option.className = 'option';
+          const option = document.createElement('label'); option.className = 'option';
           const input = document.createElement('input');
-          input.type = multi ? 'checkbox' : 'radio';
-          input.name = `option-${current}`;
-          input.value = label;
+          input.type = multi ? 'checkbox' : 'radio'; input.name = `option-${current}`; input.value = label;
           input.addEventListener('change', () => {
-            actionBtn.disabled = false;
-            gradedStatus[current] = false;
-            feedback.textContent = '';
-            feedback.className = 'feedback';
-            actionBtn.textContent = '提交';
-            explainBox.textContent = '';
-            explainBtn.style.display = 'none';
+            actionBtn.disabled = false; gradedStatus[current] = false;
+            feedback.textContent = ''; feedback.className = 'feedback';
+            actionBtn.textContent = '提交'; explainBox.textContent = ''; explainBtn.style.display = 'none';
           });
           const content = document.createElement('span');
           content.innerHTML = `<strong>${label}.</strong> ${escapeHtml(text)}`;
-          option.append(input, content);
-          optsArea.appendChild(option);
+          option.append(input, content); optsArea.appendChild(option);
         });
 
         if (userChoices[current]) {
-          optsArea.querySelectorAll('input').forEach(input => {
-            input.checked = userChoices[current].includes(input.value);
-          });
+          optsArea.querySelectorAll('input').forEach(input => input.checked = userChoices[current].includes(input.value));
         }
 
         const wasGraded = Boolean(gradedStatus[current]);
         actionBtn.textContent = wasGraded ? (current < quiz.length - 1 ? '下一题' : '完成') : '提交';
         actionBtn.disabled = !userChoices[current]?.length;
+        
         prevBtn.style.display = current > 0 ? 'inline-block' : 'none';
+        
         favBtn.classList.toggle('faved', isFav(question.question));
         favBtn.onclick = () => toggleFav(question);
 
         if (wasGraded) showFeedback();
         if (explanationCache[current]) {
           explainBox.textContent = explanationCache[current];
-          explainBtn.style.display = 'inline-block';
+          explainBtn.style.display = 'inline-grid';
         }
       }
 
-      function escapeHtml(value) {
-        return String(value).replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
-      }
+      function escapeHtml(value) { return String(value).replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char])); }
 
       function showFeedback() {
-        const correct = quiz[current].answer;
-        const selected = userChoices[current] || [];
+        const correct = quiz[current].answer; const selected = userChoices[current] || [];
         const ok = isSameSet(selected, correct);
-        feedback.textContent = ok ? '正确，继续保持。' : `错误，正确答案：${correct.sort().join('、')}`;
+        /* 按照要求，将原句精简改为： “正确” 两个字 */
+        feedback.textContent = ok ? '正确' : `错误，正确答案：${correct.sort().join('、')}`;
         feedback.className = `feedback ${ok ? 'correct' : 'incorrect'}`;
-        explainBtn.style.display = 'inline-block';
+        explainBtn.style.display = 'inline-grid';
       }
 
       function submitAnswer() {
-        const selected = [...optsArea.querySelectorAll('input')].filter(input => input.checked).map(input => input.value).sort();
-        if (!selected.length) {
-          notify('请先选择答案');
-          return;
-        }
-        userChoices[current] = selected;
-        gradedStatus[current] = true;
+        const selected = [...optsArea.querySelectorAll('input')].filter(i => i.checked).map(i => i.value).sort();
+        if (!selected.length) return notify('请先选择答案');
+        userChoices[current] = selected; gradedStatus[current] = true;
         actionBtn.textContent = current < quiz.length - 1 ? '下一题' : '完成';
         showFeedback();
       }
 
       actionBtn.addEventListener('click', () => {
-        if (gradedStatus[current]) {
-          if (current < quiz.length - 1) {
-            current += 1;
-            renderQuestion();
-          } else {
-            endQuiz();
-          }
-        } else {
-          submitAnswer();
-        }
+        if (gradedStatus[current]) { current < quiz.length - 1 ? (current += 1, renderQuestion()) : endQuiz(); }
+        else submitAnswer();
       });
 
-      prevBtn.addEventListener('click', () => {
-        if (current > 0) {
-          current -= 1;
-          renderQuestion();
-        }
-      });
+      prevBtn.addEventListener('click', () => { if (current > 0) { current -= 1; renderQuestion(); }});
 
       function endQuiz() {
-        const score = quiz.reduce((sum, question, index) => sum + (isSameSet(userChoices[index], question.answer) ? 1 : 0), 0);
-        qNum.textContent = '练习完成';
-        qText.textContent = `得分 ${score} / ${quiz.length}`;
-        optsArea.innerHTML = '';
-        actionBtn.style.display = 'none';
-        prevBtn.style.display = 'none';
-        favBtn.style.display = 'none';
-        jumpBtn.style.display = 'none';
-        fullscreenBtn.style.display = 'none';
-        feedback.textContent = `正确率 ${Math.round((score / quiz.length) * 100)}%`;
-        feedback.className = 'feedback correct';
-        explainBtn.style.display = 'none';
-        explainBox.textContent = '';
+        const score = quiz.reduce((sum, q, i) => sum + (isSameSet(userChoices[i], q.answer) ? 1 : 0), 0);
+        qNum.textContent = '练习完成'; qText.textContent = `得分 ${score} / ${quiz.length}`;
+        optsArea.innerHTML = ''; actionBtn.style.display = 'none'; prevBtn.style.display = 'none';
+        favBtn.style.display = 'none'; jumpBtn.style.display = 'none'; fullscreenBtn.style.display = 'none';
+        explainBtn.style.display = 'none'; explainBox.textContent = '';
+        feedback.textContent = `正确率 ${Math.round((score / quiz.length) * 100)}%`; feedback.className = 'feedback correct';
         
-        if (typeof confetti === 'function') {
-          confetti({
-            particleCount: 150,
-            spread: 90,
-            origin: { y: 0.6 },
-            colors: ['#2563eb', '#0ea5e9', '#16a34a', '#f59e0b', '#7c3aed']
-          });
-        }
-        
+        if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#8DD5FF', '#16a34a', '#f59e0b', '#7c3aed'] });
         if (document.fullscreenElement) document.exitFullscreen();
+        if (document.body.classList.contains('immersive')) { document.body.classList.remove('immersive'); }
       }
 
       function startQuiz(text, fromFavorites = false) {
         quiz = fromFavorites ? favorites.map(item => structuredClone(item)) : parseText(text);
-        if (!quiz.length) {
-          notify('题库为空或格式不正确');
-          return;
-        }
-        current = 0;
-        userChoices = [];
-        gradedStatus = [];
-        Object.keys(explanationCache).forEach(key => delete explanationCache[key]);
-        quizBox.style.display = 'block';
-        renderQuestion();
-        if(!document.fullscreenElement) {
-          quizBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (!quiz.length) return notify('题库为空或格式不正确');
+        current = 0; userChoices = []; gradedStatus = []; Object.keys(explanationCache).forEach(k => delete explanationCache[k]);
+        quizBox.style.display = 'block'; renderQuestion();
+        if (!document.body.classList.contains('immersive')) quizBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       buildBtn.addEventListener('click', () => startQuiz(rawInput.value.trim(), false));
@@ -713,297 +591,181 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
 
       document.addEventListener('keydown', event => {
         const isInput = document.activeElement === rawInput || document.activeElement === chatInput;
-
         if (event.metaKey || event.ctrlKey) {
-          if (event.key.toLowerCase() === 's') {
-            event.preventDefault();
-            if (quizBox.style.display !== 'none' && favBtn.style.display !== 'none') {
-              favBtn.click();
-            }
-            return;
-          }
-          if (event.key === '[') {
-            event.preventDefault();
-            if (quizBox.style.display !== 'none' && prevBtn.style.display !== 'none') {
-              prevBtn.click();
-            }
-            return;
-          }
-          if (event.key === ']') {
-            event.preventDefault();
-            if (quizBox.style.display !== 'none' && actionBtn.style.display !== 'none' && !actionBtn.disabled) {
-              actionBtn.click();
-            }
-            return;
-          }
-          if (event.key === '/') {
-            event.preventDefault();
-            openChat.click();
-            return;
-          }
+          if (event.key.toLowerCase() === 's') { event.preventDefault(); if (quizBox.style.display !== 'none' && favBtn.style.display !== 'none') favBtn.click(); return; }
+          if (event.key === '[') { event.preventDefault(); if (quizBox.style.display !== 'none' && prevBtn.style.display !== 'none') prevBtn.click(); return; }
+          if (event.key === ']') { event.preventDefault(); if (quizBox.style.display !== 'none' && actionBtn.style.display !== 'none' && !actionBtn.disabled) actionBtn.click(); return; }
+          if (event.key === '/') { event.preventDefault(); openChat.click(); return; }
         }
-
         if (isInput) return;
-
         if (event.key >= '1' && event.key <= '8') {
-          const index = Number(event.key) - 1;
-          const letter = String.fromCharCode('A'.charCodeAt(0) + index);
-          const input = optsArea.querySelector(`input[value="${letter}"]`);
-          if (input) {
-            if (input.type === 'checkbox') input.checked = !input.checked;
-            else input.checked = true;
-            input.dispatchEvent(new Event('change'));
-          }
+          const input = optsArea.querySelector(`input[value="${String.fromCharCode('A'.charCodeAt(0) + Number(event.key) - 1)}"]`);
+          if (input) { input.type === 'checkbox' ? input.checked = !input.checked : input.checked = true; input.dispatchEvent(new Event('change')); }
         } else if (event.key === 'Enter' && quizBox.style.display !== 'none') {
-          event.preventDefault();
-          if (!actionBtn.disabled && actionBtn.style.display !== 'none') actionBtn.click();
+          event.preventDefault(); if (!actionBtn.disabled && actionBtn.style.display !== 'none') actionBtn.click();
         }
       });
 
       showShortcutsBtn.addEventListener('click', () => openModal(shortcutsModal));
-
       saveBtn.addEventListener('click', () => {
-        const text = rawInput.value.trim();
-        if (!text) {
-          notify('题库内容为空');
-          return;
-        }
-        const name = prompt('题库名称');
-        if (!name?.trim()) return;
-        quizBank.push({ name: name.trim(), text, createdAt: Date.now() });
-        saveStorage('quizBank', quizBank);
-        notify('题库已保存');
+        const text = rawInput.value.trim(); if (!text) return notify('题库内容为空');
+        const name = prompt('题库名称'); if (!name?.trim()) return;
+        quizBank.push({ name: name.trim(), text, createdAt: Date.now() }); saveStorage('quizBank', quizBank); notify('题库已保存');
       });
 
-      showBankBtn.addEventListener('click', () => {
-        renderBank();
-        openModal(bankModal);
-      });
-
+      showBankBtn.addEventListener('click', () => { renderBank(); openModal(bankModal); });
       function renderBank() {
         bankList.innerHTML = '';
-        if (!quizBank.length) {
-          bankList.innerHTML = '<div class="empty">暂无题库</div>';
-          return;
-        }
+        if (!quizBank.length) return bankList.innerHTML = '<div class="empty">暂无题库</div>';
         quizBank.forEach((bank, index) => {
-          const item = document.createElement('div');
-          item.className = 'list-item';
-          const title = document.createElement('div');
-          title.className = 'list-title';
-          title.textContent = bank.name;
-          const actions = document.createElement('div');
-          actions.className = 'mini-actions';
-          const load = document.createElement('button');
-          load.textContent = '加载';
-          load.onclick = () => {
-            rawInput.value = bank.text;
-            closeModal(bankModal);
-            startQuiz(bank.text, false);
-          };
-          const del = document.createElement('button');
-          del.className = 'danger-btn';
-          del.textContent = '删除';
-          del.onclick = () => {
-            if (confirm('确认删除这个题库？')) {
-              quizBank.splice(index, 1);
-              saveStorage('quizBank', quizBank);
-              renderBank();
-            }
-          };
-          actions.append(load, del);
-          item.append(title, actions);
-          bankList.appendChild(item);
+          const item = document.createElement('div'); item.className = 'list-item';
+          const title = document.createElement('div'); title.className = 'list-title'; title.textContent = bank.name;
+          const actions = document.createElement('div'); actions.className = 'mini-actions';
+          const load = document.createElement('button'); load.className = 'ghost'; load.textContent = '加载';
+          load.onclick = () => { rawInput.value = bank.text; closeModal(bankModal); startQuiz(bank.text, false); };
+          const del = document.createElement('button'); del.className = 'ghost'; del.textContent = '删除';
+          del.onclick = () => { if (confirm('确认删除？')) { quizBank.splice(index, 1); saveStorage('quizBank', quizBank); renderBank(); } };
+          actions.append(load, del); item.append(title, actions); bankList.appendChild(item);
         });
       }
 
-      manageFavBtn.addEventListener('click', () => {
-        renderFav();
-        openModal(favManager);
-      });
-
+      manageFavBtn.addEventListener('click', () => { renderFav(); openModal(favManager); });
       function renderFav() {
         favList.innerHTML = '';
-        if (!favorites.length) {
-          favList.innerHTML = '<div class="empty">暂无收藏</div>';
-          updateFavButtons();
-          return;
-        }
+        if (!favorites.length) { updateFavButtons(); return favList.innerHTML = '<div class="empty">暂无收藏</div>'; }
         favorites.forEach((question, index) => {
-          const item = document.createElement('div');
-          item.className = 'list-item';
-          const title = document.createElement('div');
-          title.className = 'list-title';
-          title.textContent = `${index + 1}. ${question.question}`;
-          const actions = document.createElement('div');
-          actions.className = 'mini-actions';
-          const del = document.createElement('button');
-          del.className = 'danger-btn';
-          del.textContent = '删除';
-          del.onclick = () => {
-            favorites.splice(index, 1);
-            saveStorage('favorites', favorites);
-            updateFavButtons();
-            renderFav();
-            if (quiz[current]) favBtn.classList.toggle('faved', isFav(quiz[current].question));
-          };
-          actions.append(del);
-          item.append(title, actions);
-          favList.appendChild(item);
+          const item = document.createElement('div'); item.className = 'list-item';
+          const title = document.createElement('div'); title.className = 'list-title'; title.textContent = `${index + 1}. ${question.question}`;
+          const actions = document.createElement('div'); actions.className = 'mini-actions';
+          const del = document.createElement('button'); del.className = 'ghost'; del.textContent = '删除';
+          del.onclick = () => { favorites.splice(index, 1); saveStorage('favorites', favorites); updateFavButtons(); renderFav(); if (quiz[current]) favBtn.classList.toggle('faved', isFav(quiz[current].question)); };
+          actions.append(del); item.append(title, actions); favList.appendChild(item);
         });
       }
 
       clearFavBtn.addEventListener('click', () => {
-        if (favorites.length === 0) {
-          notify('收藏夹已经是空的啦');
-          return;
-        }
-        if (confirm('确定要清空所有收藏的题目吗？此操作不可恢复。')) {
-          favorites = [];
-          saveStorage('favorites', favorites);
-          updateFavButtons();
-          renderFav();
-          if (quiz[current]) favBtn.classList.remove('faved');
-          notify('收藏夹已清空');
-        }
+        if (favorites.length === 0) return notify('收藏夹为空');
+        if (confirm('确定清空所有收藏题目吗？')) { favorites = []; saveStorage('favorites', favorites); updateFavButtons(); renderFav(); if (quiz[current]) favBtn.classList.remove('faved'); notify('已清空'); }
       });
 
-      jumpBtn.addEventListener('click', () => {
-        renderJump();
-        openModal(jumpModal);
-      });
-
+      jumpBtn.addEventListener('click', () => { renderJump(); openModal(jumpModal); });
       function renderJump() {
         jumpGrid.innerHTML = '';
         quiz.forEach((_, index) => {
-          const button = document.createElement('button');
-          button.textContent = String(index + 1);
-          if (gradedStatus[index]) button.classList.add('done');
-          if (index === current) button.classList.add('current');
-          button.onclick = () => {
-            current = index;
-            renderQuestion();
-            closeModal(jumpModal);
-          };
-          jumpGrid.appendChild(button);
+          const btn = document.createElement('button'); btn.textContent = String(index + 1);
+          if (gradedStatus[index]) btn.classList.add('done'); if (index === current) btn.classList.add('current');
+          btn.onclick = () => { current = index; renderQuestion(); closeModal(jumpModal); };
+          jumpGrid.appendChild(btn);
         });
       }
 
-      function openModal(modal) {
-        modal.classList.add('open');
-      }
-
-      function closeModal(modal) {
-        modal.classList.remove('open');
-      }
-
-      document.querySelectorAll('[data-close]').forEach(button => {
-        button.addEventListener('click', () => closeModal($(button.dataset.close)));
-      });
-      document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-        backdrop.addEventListener('click', event => {
-          if (event.target === backdrop) closeModal(backdrop);
-        });
-      });
+      function openModal(modal) { modal.classList.add('open'); }
+      function closeModal(modal) { modal.classList.remove('open'); }
+      document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal($(btn.dataset.close))));
+      document.querySelectorAll('.modal-backdrop').forEach(bd => bd.addEventListener('click', e => { if (e.target === bd) closeModal(bd); }));
 
       async function streamExplain(prompt, key, target) {
         try {
-          const response = await fetch('https://quizpass.vercel.app/api/explain', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
-          });
+          const response = await fetch('https://quizpass.vercel.app/api/explain', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) });
           if (!response.ok || !response.body) throw new Error('AI 服务暂时不可用');
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder('utf-8');
-          let buffer = '';
-          let text = '';
+          const reader = response.body.getReader(), decoder = new TextDecoder('utf-8');
+          let buffer = '', text = '';
           while (true) {
             const { value, done } = await reader.read();
             if (done) break;
             buffer += decoder.decode(value, { stream: true });
-            const parts = buffer.split('\n\n');
-            buffer = parts.pop();
+            const parts = buffer.split('\n\n'); buffer = parts.pop();
             for (const part of parts) {
               if (!part.startsWith('data:')) continue;
-              const data = part.slice(5).trim();
-              if (data === '[DONE]') continue;
-              let delta = '';
-              try {
-                const parsed = JSON.parse(data);
-                delta = parsed.choices?.[0]?.delta?.content || parsed.error || '';
-              } catch (_) {}
-              text += delta;
-              target.textContent = text;
+              const data = part.slice(5).trim(); if (data === '[DONE]') continue;
+              let delta = ''; try { const parsed = JSON.parse(data); delta = parsed.choices?.[0]?.delta?.content || parsed.error || ''; } catch (_) {}
+              text += delta; target.textContent = text;
             }
           }
-          if (!text) target.textContent = '暂无解析内容，请稍后再试。';
+          if (!text) target.textContent = '暂无内容，请稍后再试。';
           if (key !== null) explanationCache[key] = target.textContent;
-        } catch (error) {
-          target.textContent = error.message || '解析失败，请稍后再试。';
-        }
+        } catch (error) { target.textContent = error.message || '解析失败，请稍后再试。'; }
       }
 
       explainBtn.addEventListener('click', () => {
-        if (explanationCache[current]) {
-          explainBox.textContent = explanationCache[current];
-          return;
-        }
+        if (explanationCache[current]) return explainBox.textContent = explanationCache[current];
         explainBox.textContent = '解析生成中…';
-        const optionsText = [...optsArea.querySelectorAll('label')].map(label => label.innerText).join('\n');
+        const optionsText = [...optsArea.querySelectorAll('label')].map(l => l.innerText).join('\n');
         const selected = (userChoices[current] || []).join('、') || '未选择';
         const prompt = `题目：${qText.textContent}\n选项：\n${optionsText}\n我选择的答案：${selected}\n正确答案：${quiz[current].answer.join('、')}\n请给出简洁解析（200字内）。`;
         streamExplain(prompt, current, explainBox);
       });
 
-      openChat.addEventListener('click', () => {
+      // AI 控制开关
+      openChat.addEventListener('click', (e) => {
+        e.stopPropagation(); // 阻止事件冒泡，防止触发“点击外部关闭”逻辑
         chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
         if (chatPanel.style.display === 'flex') chatInput.focus();
       });
 
-      chatInput.addEventListener('input', function() {
-        this.style.height = 'auto'; 
-        this.style.height = this.scrollHeight + 'px'; 
+      // 手机端专用关闭键点击逻辑
+      mobileChatClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        chatPanel.style.display = 'none';
       });
 
-      let isComposing = false;
-      chatInput.addEventListener('compositionstart', () => { isComposing = true; });
-      chatInput.addEventListener('compositionend', () => { isComposing = false; });
-
-      chatSend.addEventListener('click', () => {
-        const value = chatInput.value.trim();
-        if (!value) return;
-        chatInput.value = '';
-        chatInput.style.height = 'auto'; 
-        chatStream(value);
-      });
-
-      chatInput.addEventListener('keydown', event => {
-        if (event.key === 'Enter') {
-          if (isComposing) return; 
-          
-          if (!event.shiftKey) { 
-            event.preventDefault(); 
-            chatSend.click();
+      // 电脑Web端：点击聊天框以外的任意区域收起聊天框
+      document.addEventListener('click', (event) => {
+        const isMobile = window.innerWidth <= 860;
+        // 如果是电脑端，且聊天框处于打开状态
+        if (!isMobile && chatPanel.style.display === 'flex') {
+          // 判断点击的区域既不是聊天框本身，也不是呼叫 AI 的球形按钮
+          if (!chatPanel.contains(event.target) && !openChat.contains(event.target)) {
+            chatPanel.style.display = 'none';
           }
         }
       });
 
-      async function chatStream(message) {
-        if (chatPlaceholder) {
-          chatPlaceholder.style.display = 'none';
-        }
+      // 手机悬浮球自由移动触控逻辑（不带任何关闭按钮）
+      let isDragging = false, startX, startY, initialTop, initialLeft;
+      aiWrapper.addEventListener('touchstart', e => {
+        isDragging = true;
+        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+        const rect = aiWrapper.getBoundingClientRect();
+        initialLeft = rect.left; initialTop = rect.top;
+        aiWrapper.style.transition = 'none';
+      }, {passive: false});
 
-        const row = document.createElement('div');
-        row.className = 'chat-row';
-        const user = document.createElement('div');
-        user.innerHTML = `<strong>你：</strong>${escapeHtml(message)}`;
-        const ai = document.createElement('div');
-        ai.innerHTML = '<strong>AI：</strong><span></span>';
+      aiWrapper.addEventListener('touchmove', e => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const dx = e.touches[0].clientX - startX, dy = e.touches[0].clientY - startY;
+        aiWrapper.style.left = `${initialLeft + dx}px`;
+        aiWrapper.style.top = `${initialTop + dy}px`;
+        aiWrapper.style.right = 'auto'; aiWrapper.style.bottom = 'auto';
+      }, {passive: false});
+
+      aiWrapper.addEventListener('touchend', () => { isDragging = false; });
+
+      chatInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; });
+      let isComposing = false;
+      chatInput.addEventListener('compositionstart', () => isComposing = true);
+      chatInput.addEventListener('compositionend', () => isComposing = false);
+
+      chatSend.addEventListener('click', () => {
+        const value = chatInput.value.trim(); if (!value) return;
+        chatInput.value = ''; chatInput.style.height = 'auto'; chatStream(value);
+      });
+
+      chatInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+          if (isComposing) return;
+          if (!event.shiftKey) { event.preventDefault(); chatSend.click(); }
+        }
+      });
+
+      async function chatStream(message) {
+        if (chatPlaceholder) chatPlaceholder.style.display = 'none';
+        const row = document.createElement('div'); row.className = 'chat-row';
+        const user = document.createElement('div'); user.innerHTML = `<strong>你：</strong>${escapeHtml(message)}`;
+        const ai = document.createElement('div'); ai.innerHTML = '<strong>AI：</strong><span></span>';
         const span = ai.querySelector('span');
-        row.append(user, ai);
-        chatLog.appendChild(row);
-        chatLog.scrollTop = chatLog.scrollHeight;
+        row.append(user, ai); chatLog.appendChild(row); chatLog.scrollTop = chatLog.scrollHeight;
         await streamExplain(message, null, span);
         chatLog.scrollTop = chatLog.scrollHeight;
       }
