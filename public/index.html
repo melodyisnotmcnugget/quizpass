@@ -299,7 +299,6 @@
       const saveStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
       const normalizeLetter = letter => String(letter || '').replace(/[Ａ-Ｈ]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 65248)).toUpperCase();
       
-      // 增强的题干清理：兼容 1. / 1、 / (1) / 【1】 / 1) 等各种中英文序号
       const normalizeQuestion = q => {
         return String(q || '')
           .trim()
@@ -353,7 +352,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
       }
       updateFavButtons();
 
-      // 彻底健壮重构的题库文本解析器
       function parseText(text) {
         const lines = text.replace(/\r/g, '').split('\n');
         const result = [];
@@ -373,17 +371,13 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
           const line = rawLine.trim();
           if (!line) continue;
 
-          // 1. 匹配答案行。兼容：*B、*AB、正确答案：A、*B（解析：xxx）。
-          // 逻辑：遇到星号或"答案"关键字，提取紧随其后的 A-H 字母集合，自动丢弃尾随的括号解析。
           const answerMatch = line.match(/^\*\s*([A-HＡ-Ｈ]+)/i) || line.match(/^(?:答案|正确答案)[:：]\s*([A-HＡ-Ｈ\s,，、]+)/i);
           if (answerMatch && currentQuestion) {
-            // 清理多选答案间的逗号空格，只保留纯字母
             const pureLetters = answerMatch[1].replace(/[\s,，、]+/g, '').split('');
             currentQuestion.answer = pureLetters;
             continue;
           }
 
-          // 2. 匹配选项行。支持单行多选项，兼容 A. B、 C． D) 等
           const optionMatches = [...line.matchAll(/([A-HＡ-Ｈ])\s*[\.．、\s)]\s*([^A-HＡ-Ｈ]*?)(?=\s+[A-HＡ-Ｈ]\s*[\.．、\s)]|$)/gi)];
           if (optionMatches.length) {
             if (!currentQuestion) currentQuestion = { question: '', options: [], answer: [] };
@@ -395,7 +389,6 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
             continue;
           }
 
-          // 3. 如果既不是选项也不是答案，则是新题干
           pushQuestion();
           currentQuestion = { question: line, options: [], answer: [] };
         }
@@ -475,7 +468,7 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
 
         if (wasGraded) showFeedback();
         if (explanationCache[current]) {
-          explainBox.textContent = explanationCache[current];
+          explainBox.innerHTML = explanationCache[current]; // 修复缓存读取使用 innerHTML
           explainBtn.style.display = 'inline-block';
         }
       }
@@ -720,6 +713,17 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
             const { value, done } = await reader.read();
             if (done) break;
             buffer += decoder.decode(value, { stream: true });
+
+            // 👉 新增：拦截并显示 DeepSeek 的官方报错（如余额不足、Key错误）
+            if (buffer.trim().startsWith('{"error"')) {
+              try {
+                const errData = JSON.parse(buffer);
+                text = `⚠️ DeepSeek 报错: ${errData.error?.message || errData.error?.code || '未知错误'}`;
+                target.innerHTML = `<span style="color:#dc2626; font-weight:bold;">${text}</span>`;
+                return; // 遇到报错直接结束
+              } catch (_) {}
+            }
+
             const parts = buffer.split('\n\n');
             buffer = parts.pop();
             for (const part of parts) {
@@ -732,11 +736,18 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
                 delta = parsed.choices?.[0]?.delta?.content || parsed.error || '';
               } catch (_) {}
               text += delta;
-              target.textContent = text;
+              
+              // 简单的正则匹配换行和加粗，优化 AI 排版显示
+              target.innerHTML = escapeHtml(text)
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             }
           }
-          if (!text) target.textContent = '暂无解析内容，请稍后再试。';
-          if (key !== null) explanationCache[key] = target.textContent;
+          if (!text) {
+            target.textContent = '暂无解析内容，请稍后再试。';
+          } else {
+            if (key !== null) explanationCache[key] = target.innerHTML; // 修复缓存存储使用 innerHTML
+          }
         } catch (error) {
           target.textContent = error.message || '解析失败，请稍后再试。';
         }
@@ -744,7 +755,7 @@ A. 鼠标 B. 键盘 C. 显示器 D. 打印机
 
       explainBtn.addEventListener('click', () => {
         if (explanationCache[current]) {
-          explainBox.textContent = explanationCache[current];
+          explainBox.innerHTML = explanationCache[current]; // 修复缓存读取使用 innerHTML
           return;
         }
         explainBox.textContent = '解析生成中…';
